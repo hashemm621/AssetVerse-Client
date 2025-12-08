@@ -5,15 +5,13 @@ import { Link } from "react-router";
 import { motion } from "framer-motion";
 
 const Navbar = () => {
-  const links = (
-    <>
-      <li><Link to="/">Home</Link></li>
-      <li><Link to="/features">Features</Link></li>
-      <li><Link to="/FAQ">FAQ</Link></li>
-      <li><Link to="/testimonials">Testimonials</Link></li>
-      <li><Link to="/aboutUs">About Us</Link></li>
-    </>
-  );
+  const links = [
+    { name: "Home", to: "/" },
+    { name: "Features", to: "/features" },
+    { name: "FAQ", to: "/FAQ" },
+    { name: "Testimonials", to: "/testimonials" },
+    { name: "About Us", to: "/aboutUs" },
+  ];
 
   return (
     <motion.nav
@@ -28,12 +26,7 @@ const Navbar = () => {
         <div className="navbar-start">
           {/* Mobile Hamburger */}
           <div className="dropdown">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost lg:hidden"
-            >
-              {/* Animated Hamburger */}
+            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
               <motion.svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-6 w-6"
@@ -55,11 +48,15 @@ const Navbar = () => {
               tabIndex={-1}
               className="menu menu-sm dropdown-content bg-secondary rounded-box z-10 mt-3 w-52 p-2 shadow"
             >
-              {links}
+              {links.map((link, idx) => (
+                <li key={idx}>
+                  <Link to={link.to}>{link.name}</Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Logo with animation */}
+          {/* Logo */}
           <Link to="/" className="text-xl">
             <motion.img
               src={logo}
@@ -74,17 +71,13 @@ const Navbar = () => {
         {/* Desktop Menu */}
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1 space-x-2">
-            {React.Children.map(links.props.children, (child) => (
+            {links.map((link, idx) => (
               <motion.li
-                whileHover={{ scale: 1.08 }}
-                transition={{ duration: 0.2 }}
+                key={idx}
+                whileHover={{ scale: 1.08, x: 3 }}
+                transition={{ type: "spring", stiffness: 200 }}
               >
-                <motion.div
-                  whileHover={{ x: 3 }}
-                  transition={{ type: "spring", stiffness: 200 }}
-                >
-                  {child}
-                </motion.div>
+                <Link to={link.to}>{link.name}</Link>
               </motion.li>
             ))}
           </ul>
@@ -100,6 +93,7 @@ const Navbar = () => {
             Login
           </motion.button>
         </div>
+
       </MyContainer>
     </motion.nav>
   );
