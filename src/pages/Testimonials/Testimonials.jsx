@@ -61,7 +61,7 @@ const testimonialsData = [
       "I love how AssetVerse automatically handles asset assignments and returns. It reduces human error drastically.",
   },
   {
-    name: "James Wilson",
+    name: "Kateryna Wilson",
     image: test7,
     company: "TechNova",
     role: "IT Administrator",
@@ -77,7 +77,7 @@ const testimonialsData = [
       "The package management and employee affiliation features are excellent. We can scale without any hassle.",
   },
   {
-    name: "William Johnson",
+    name: "Clarisse Johnson",
     image: test9,
     company: "InnovateTech",
     role: "Team Lead",
@@ -165,8 +165,6 @@ const Testimonials = () => {
             </div>
           ))}
         </motion.div>
-
-       
       </MyContainer>
     </section>
   );
