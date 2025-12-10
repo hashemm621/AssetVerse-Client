@@ -46,6 +46,7 @@ const Features = () => {
           variants={fadeUp}
           initial="hidden"
           animate="show"
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
           <h1 className="text-4xl md:text-5xl font-bold">

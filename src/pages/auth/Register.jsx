@@ -1,11 +1,11 @@
 import React from 'react';
 
-const RegisterHR = () => {
+const Register = () => {
     return (
         <div>
-            /registerHR
+            Register
         </div>
     );
 };
 
-export default RegisterHR;
+export default Register;

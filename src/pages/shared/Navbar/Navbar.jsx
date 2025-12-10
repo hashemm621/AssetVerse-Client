@@ -3,8 +3,10 @@ import logo from "../../../assets/logo.png";
 import MyContainer from "../../../components/MyContainer";
 import { Link } from "react-router";
 import { motion } from "framer-motion";
+import useAuth from "../../../hooks/useAuth";
 
 const Navbar = () => {
+  const {user} = useAuth()
   const links = [
     { name: "Home", to: "/" },
     { name: "Features", to: "/features" },
@@ -85,14 +87,43 @@ const Navbar = () => {
 
         {/* Right Button */}
         <div className="navbar-end">
-          <motion.button
-            className="btn bg-secondary border-none hover:bg-secondary/80"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.92 }}
-          >
-            Login
-          </motion.button>
+  {user ? (
+    <div className="dropdown dropdown-end">
+      <div tabIndex={0} role="button" className="btn bg-secondary border-none">
+        <div className="flex items-center gap-2">
+          <span>{user.displayName || "Profile"}</span>
+          <img
+            src={user.photoURL || "https://i.pravatar.cc/40"}
+            alt="avatar"
+            className="w-8 h-8 rounded-full"
+          />
         </div>
+      </div>
+
+      <ul
+        tabIndex={0}
+        className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40"
+      >
+        <li>
+          <Link to="/profile">Profile</Link>
+        </li>
+        <li>
+          <button>Logout</button>
+        </li>
+      </ul>
+    </div>
+  ) : (
+    <Link to="/login">
+      <motion.button
+        className="btn border-none text-accent hover:bg-accent/80 hover:text-black"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.92 }}
+      >
+        Login
+      </motion.button>
+    </Link>
+  )}
+</div>
 
       </MyContainer>
     </motion.nav>
