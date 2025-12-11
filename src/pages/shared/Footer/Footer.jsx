@@ -14,25 +14,71 @@ const Footer = () => {
           <p className="text-gray-300">
             © {new Date().getFullYear()} AssetVerse. All rights reserved.
           </p>
-          <p className="mt-2 text-gray-300">Simplifying corporate asset management.</p>
+          <p className="mt-2 text-gray-300">
+            Simplifying corporate asset management.
+          </p>
         </div>
 
         {/* 2. Contact Info */}
         <div>
           <h4 className="font-semibold mb-4">Contact Us</h4>
-          <p>Email: <a href="mailto:support@assetverse.com" className="underline">support@assetverse.com</a></p>
-          <p>Phone: <a href="tel:+1234567890" className="underline">+1 234 567 890</a></p>
+          <p>
+            Email:{" "}
+            <a
+              href="mailto:hashemm621@gmail.com"
+              className="underline">
+              support@assetverse.com
+            </a>
+          </p>
+          <p>
+            Phone:{" "}
+            <a
+              href="tel:+8801601611120"
+              className="underline">
+              +880 1601 611120
+            </a>
+          </p>
         </div>
 
         {/* 3. Quick Links */}
         <div>
           <h4 className="font-semibold mb-4">Quick Links</h4>
           <ul className="space-y-2">
-            <li><Link to="/" className="hover:text-primary">Home</Link></li>
-            <li><Link to="/features" className="hover:text-primary">Features</Link></li>
-            <li><Link to="/FAQ" className="hover:text-primary">FAQ</Link></li>
-            <li><Link to="/aboutUs" className="hover:text-primary">About Us</Link></li>
-            <li><Link to="/testimonials" className="hover:text-primary">Testimonials</Link></li>
+            <li>
+              <Link
+                to="/"
+                className="hover:text-primary">
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/features"
+                className="hover:text-primary">
+                Features
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/FAQ"
+                className="hover:text-primary">
+                FAQ
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/aboutUs"
+                className="hover:text-primary">
+                About Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/testimonials"
+                className="hover:text-primary">
+                Testimonials
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -40,16 +86,32 @@ const Footer = () => {
         <div>
           <h4 className="font-semibold mb-4">Follow Us</h4>
           <div className="flex items-center gap-4 text-white text-xl">
-            <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+            <a
+              href="https://x.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary">
               <FaXTwitter />
             </a>
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+            <a
+              href="https://www.facebook.com/hashem.hashem.56829"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary">
               <FaFacebookF />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+            <a
+              href="https://www.linkedin.com/in/md-hashem/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary">
               <FaLinkedinIn />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary">
               <FaInstagram />
             </a>
           </div>

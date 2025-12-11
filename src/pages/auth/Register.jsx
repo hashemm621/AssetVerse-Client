@@ -298,14 +298,7 @@ const Register = () => {
                 )}
               </button>
 
-              <p>
-                Already Have an Account?{" "}
-                <Link
-                  className="ms-3 text-blue-600 underline"
-                  to={"/login"}>
-                  Sign in
-                </Link>
-              </p>
+              
             </motion.form>
           )}
 
@@ -448,7 +441,11 @@ const Register = () => {
                 )}
               </button>
 
-              <p>
+              
+            </motion.form>
+          )}
+
+          <p className="mt-6">
                 Already Have an Account?{" "}
                 <Link
                   className="ms-3 text-blue-600 underline"
@@ -456,10 +453,9 @@ const Register = () => {
                   Sign in
                 </Link>
               </p>
-            </motion.form>
-          )}
         </AnimatePresence>
       </motion.section>
+      
     </div>
   );
 };

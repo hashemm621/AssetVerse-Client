@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 
 import { Link } from "react-router";
 import MyContainer from "../../../components/MyContainer";
+import useAuth from "../../../hooks/useAuth";
 
 const headingVariants = {
   hidden: { opacity: 0, x: -30 },
@@ -19,6 +20,7 @@ const buttonVariants = {
 };
 
 const Banner = () => {
+const {user} = useAuth()
   return (
     <section className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 py-16 lg:py-28">
       <MyContainer className="flex flex-col-reverse lg:flex-row items-center gap-12">
@@ -57,7 +59,7 @@ const Banner = () => {
               whileTap="tap"
               variants={buttonVariants}>
               <Link
-                to="/register-hr"
+                to={user?'/dashboard':"/register"}
                 className="btn px-6 py-3 bg-primary text-base-100 border-0 shadow-none rounded-xl">
                 Get Started — Free
               </Link>
