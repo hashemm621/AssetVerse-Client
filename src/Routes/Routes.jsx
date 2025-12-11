@@ -7,6 +7,7 @@ import Testimonials from "../pages/Testimonials/Testimonials";
 import AboutUs from "../pages/AboutUs/AboutUs";
 import Register from "../pages/auth/Register";
 import Login from "../pages/auth/Login";
+import Profile from "../pages/profile/Profile";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
       { path: "/aboutUs", Component: AboutUs },
       { path: "/register", Component: Register },
       { path: "/login" , Component:Login},
+      { path: "/profile" , Component:Profile},
     ],
   },
 ]);

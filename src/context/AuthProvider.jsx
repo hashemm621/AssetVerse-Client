@@ -23,17 +23,21 @@ const logOut =  () => {
   }
 
   const updateUserProfile = (name, photo) => {
+    
     return updateProfile(auth.currentUser, {
       displayName: name,
       photoURL: photo,
+      
     })
+    
   }
 
 
    // onAuthStateChange
   useEffect(() => {
+    
     const unsubscribe = onAuthStateChanged(auth, async currentUser => {
-      console.log('CurrentUser ===', currentUser?.email)
+      console.log('currentUser ===', currentUser?.email)
       setUser(currentUser)
       setLoading(false)
     })
@@ -46,6 +50,7 @@ const logOut =  () => {
 
 const authInfo = {
     user,
+    setUser,
     loading,
     createUser,
     signIn,

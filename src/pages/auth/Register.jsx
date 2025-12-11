@@ -1,13 +1,21 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaUserTie, FaUsers, FaEye, FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { imageUpload } from "../../utils/imagBB";
+import useAuth from "../../hooks/useAuth";
 
 const Register = () => {
   const [role, setRole] = useState("");
   const [showPassHR, setShowPassHR] = useState(false);
   const [showPassEmployee, setShowPassEmployee] = useState(false);
+  const { createUser, updateUserProfile, loading, setUser } = useAuth();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state || "/";
 
   // HR form
   const {
@@ -24,13 +32,68 @@ const Register = () => {
   } = useForm();
 
   // handle HR
-  const handleHrRegister = data => {
-    console.log("Hr data ==>", data);
+  const handleHrRegister = async data => {
+    const { companyName, image, name, email, password } = data;
+    const imageFile = image[0];
+    console.log("Hr data ==>", {
+      companyName,
+      imageFile,
+      name,
+      email,
+      password,
+    });
+
+    try {
+      const imageURL = await imageUpload(imageFile);
+
+      const result = await createUser(email, password);
+
+      await updateUserProfile(name, imageURL);
+
+      setUser({
+        ...result.user,
+        displayName: name,
+        photoURL: imageURL,
+      });
+
+      navigate(from, { replace: true });
+
+      toast.success("Register Successful");
+
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.message);
+    }
   };
 
   // handle Employee
-  const handleEmployeeRegister = data => {
-    console.log("Employ data ==>", data);
+  const handleEmployeeRegister = async data => {
+    const { name, image, email, password } = data;
+    const imageFile = image[0];
+    console.log("Employ data ==>", { name, imageFile, email, password });
+
+    try {
+      const imageURL = await imageUpload(imageFile);
+
+      const result = await createUser(email, password);
+
+      await updateUserProfile(name, imageURL);
+
+      setUser({
+        ...result.user,
+        displayName: name,
+        photoURL: imageURL,
+      });
+
+      navigate(from, { replace: true });
+      toast.success("Register Successful");
+
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.message);
+    }
   };
 
   const fade = {
@@ -70,7 +133,7 @@ const Register = () => {
           {/* HR Form */}
           {role === "hr" && (
             <motion.form
-            key='hr'
+              key="hr"
               onSubmit={handleHRSubmit(handleHrRegister)}
               {...fade}
               className="space-y-4">
@@ -105,6 +168,30 @@ const Register = () => {
                     {hrErrors.companyName.message}
                   </p>
                 )}
+              </div>
+
+              {/* Profile Image */}
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="image"
+                  className="font-medium">
+                  Company Logo:
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  {...registerHR("image")}
+                  className="block w-full text-sm text-gray-500
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-md file:border-0
+                      file:text-sm file:font-semibold
+                     file:bg-lime-50 file:text-lime-700
+                     hover:file:bg-lime-100
+                     bg-gray-100 border border-dashed border-lime-300 rounded-md cursor-pointer
+                      focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400
+                      py-2"
+                  placeholder="Enter profile image link"
+                />
               </div>
 
               {/* HR Full Name */}
@@ -204,7 +291,11 @@ const Register = () => {
               <button
                 className="btn btn-primary btn-lg w-full mt-4"
                 type="submit">
-                Register as HR Manager
+                {loading ? (
+                  <span className="loading loading-bars loading-xl"></span>
+                ) : (
+                  "Register as HR Manager"
+                )}
               </button>
 
               <p>
@@ -221,7 +312,7 @@ const Register = () => {
           {/* Employee Form */}
           {role === "employee" && (
             <motion.form
-            key={'employee'}
+              key={"employee"}
               onSubmit={handleEmployeeSubmit(handleEmployeeRegister)}
               {...fade}
               className="space-y-4">
@@ -260,10 +351,24 @@ const Register = () => {
 
               {/* Profile Image */}
               <div className="flex flex-col gap-2">
-                <label className="font-medium">Profile Image:</label>
+                <label
+                  htmlFor="image"
+                  className="font-medium">
+                  Profile Image:
+                </label>
                 <input
-                  type="text"
-                  className="input input-bordered"
+                  type="file"
+                  accept="image/*"
+                  {...registerEmployee("image")}
+                  className="block w-full text-sm text-gray-500
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-md file:border-0
+                      file:text-sm file:font-semibold
+                     file:bg-lime-50 file:text-lime-700
+                     hover:file:bg-lime-100
+                     bg-gray-100 border border-dashed border-lime-300 rounded-md cursor-pointer
+                      focus:outline-none focus:ring-2 focus:ring-lime-400 focus:border-lime-400
+                      py-2"
                   placeholder="Enter profile image link"
                 />
               </div>
@@ -336,7 +441,11 @@ const Register = () => {
               <button
                 className="btn btn-secondary btn-lg w-full mt-4"
                 type="submit">
-                Register as Employee
+                {loading ? (
+                  <span className="loading loading-bars loading-xl"></span>
+                ) : (
+                  "Register as Employee"
+                )}
               </button>
 
               <p>

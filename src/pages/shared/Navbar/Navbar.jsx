@@ -6,7 +6,8 @@ import { motion } from "framer-motion";
 import useAuth from "../../../hooks/useAuth";
 
 const Navbar = () => {
-  const {user} = useAuth()
+  const {user,logOut,loading} = useAuth()
+  console.log(user);
   const links = [
     { name: "Home", to: "/" },
     { name: "Features", to: "/features" },
@@ -87,28 +88,32 @@ const Navbar = () => {
 
         {/* Right Button */}
         <div className="navbar-end">
-  {user ? (
+  {loading ? (
+    <div className="btn border-none flex items-center gap-2">
+      <span>Loading...</span>
+      <div className="w-8  h-8 rounded-full bg-gray-300 animate-pulse"></div>
+    </div>
+  ) : user ? (
     <div className="dropdown dropdown-end">
-      <div tabIndex={0} role="button" className="btn bg-secondary border-none">
+      <div tabIndex={0} role="button" className="btn border-none">
         <div className="flex items-center gap-2">
-          <span>{user.displayName || "Profile"}</span>
+          <span>{user.displayName}</span>
           <img
-            src={user.photoURL || "https://i.pravatar.cc/40"}
+            src={user.photoURL}
             alt="avatar"
             className="w-8 h-8 rounded-full"
           />
         </div>
       </div>
-
       <ul
         tabIndex={0}
-        className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40"
+        className="dropdown-content menu p-2 shadow bg-secondary rounded-box w-40"
       >
         <li>
           <Link to="/profile">Profile</Link>
         </li>
         <li>
-          <button>Logout</button>
+          <button onClick={logOut}>Logout</button>
         </li>
       </ul>
     </div>

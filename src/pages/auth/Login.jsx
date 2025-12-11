@@ -3,17 +3,34 @@ import { motion } from "framer-motion";
 import MyContainer from "../../components/MyContainer";
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
+import useAuth from "../../hooks/useAuth";
+import { useLocation, useNavigate } from "react-router";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const {signIn,loading} = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state || '/'
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const handleSignin = data => {
-    console.log(data);
+  const handleSignin =async data => {
+    const {email,password} = data
+    try {
+      await signIn(email,password)
+
+      navigate(from,{replace:true})
+      toast.success('Login Successful')
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.message)
+    }
   };
 
   return (
@@ -103,7 +120,8 @@ const Login = () => {
             <a
               href="/register"
               className="text-primary font-semibold hover:underline">
-              Sign Up
+              {loading?<span className="loading loading-bars loading-xl"></span>:'Sign Up'}
+              
             </a>
           </div>
         </motion.div>
