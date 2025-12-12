@@ -38,13 +38,7 @@ const Register = () => {
   const handleHrRegister = async data => {
     const { companyName, image, name, email, password } = data;
     const imageFile = image[0];
-    console.log("Hr data ==>", {
-      companyName,
-      imageFile,
-      name,
-      email,
-      password,
-    });
+   
 
     try {
       const imageURL = await imageUpload(imageFile);
@@ -58,19 +52,19 @@ const Register = () => {
         displayName: name,
         photoURL: imageURL,
       });
-      console.log(data);
 
       const userInfo = {
-        companyName: data.companyName,
-        email: data.email,
-        displayName: data.name,
+        companyName: companyName,
+        email: email,
+        displayName: name,
         photoURL: imageURL,
         dob:data.dob,
         role: "hr",
         
       };
       axiosInstance.post("/users", userInfo).then(res => {
-        if (res.data.insertedId) {
+        if (res.data.data?.insertedId) {
+          
           console.log("user Created in dataBase");
           navigate(from, { replace: true });
 
@@ -104,9 +98,25 @@ const Register = () => {
         photoURL: imageURL,
       });
 
-      navigate(from, { replace: true });
-      toast.success("Register Successful");
 
+      const userInfo= {
+        
+        email: email,
+        displayName: name,
+        photoURL: imageURL,
+        dob:data.dob,
+        role: "employee",
+      }
+
+      axiosInstance.post("/users", userInfo).then(res => {
+        if (res.data.data?.insertedId) {
+         
+          console.log("user Created in dataBase");
+          navigate(from, { replace: true });
+
+          toast.success("Register Successful");
+        }
+      });
       console.log(result);
     } catch (error) {
       console.log(error);
