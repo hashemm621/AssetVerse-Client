@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { imageUpload } from "../../utils/imagBB";
 import useAuth from "../../hooks/useAuth";
+import useAxios from "../../hooks/useAxios";
+
 
 const Register = () => {
   const [role, setRole] = useState("");
@@ -16,6 +18,7 @@ const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state || "/";
+  const axiosInstance = useAxios()
 
   // HR form
   const {
@@ -55,12 +58,27 @@ const Register = () => {
         displayName: name,
         photoURL: imageURL,
       });
+      console.log(data);
 
-      navigate(from, { replace: true });
+      const userInfo = {
+        companyName: data.companyName,
+        email: data.email,
+        displayName: data.name,
+        photoURL: imageURL,
+        dob:data.dob,
+        role: "hr",
+        
+      };
+      axiosInstance.post("/users", userInfo).then(res => {
+        if (res.data.insertedId) {
+          console.log("user Created in dataBase");
+          navigate(from, { replace: true });
 
-      toast.success("Register Successful");
+          toast.success("Register Successful");
+        }
+      });
 
-      console.log(result);
+      
     } catch (error) {
       console.log(error);
       toast.error(error?.message);
@@ -282,6 +300,24 @@ const Register = () => {
                 )}
               </div>
 
+              {/* HR Full Name */}
+              <div className="flex flex-col gap-2">
+                <label className="font-medium">Date of Birth:</label>
+                <input
+                  {...registerHR("dob", {
+                    required: "Date of Birth is required",
+                  })}
+                  type="date"
+                  className="input input-bordered"
+                  placeholder="Enter your full name"
+                />
+                {hrErrors.name && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {hrErrors.name.message}
+                  </p>
+                )}
+              </div>
+
               {/* Free Package Note */}
               <p className="text-sm text-info mt-1">
                 🎁 You will automatically receive a free package for 5
@@ -297,8 +333,6 @@ const Register = () => {
                   "Register as HR Manager"
                 )}
               </button>
-
-              
             </motion.form>
           )}
 
@@ -426,6 +460,24 @@ const Register = () => {
                 )}
               </div>
 
+              {/* date of birth */}
+              <div className="flex flex-col gap-2">
+                <label className="font-medium">Date of Birth:</label>
+                <input
+                  {...registerEmployee("dob", {
+                    required: "Date of Birth is required",
+                  })}
+                  type="date"
+                  className="input input-bordered"
+                  placeholder="Enter your full name"
+                />
+                {employeeErrors.name && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {employeeErrors.name.message}
+                  </p>
+                )}
+              </div>
+
               <p className="text-sm text-warning mt-1">
                 ⚠ You will not be linked to any company until an HR Manager adds
                 you.
@@ -440,22 +492,20 @@ const Register = () => {
                   "Register as Employee"
                 )}
               </button>
-
-              
             </motion.form>
           )}
 
-          <p className="mt-6">
-                Already Have an Account?{" "}
-                <Link
-                  className="ms-3 text-blue-600 underline"
-                  to={"/login"}>
-                  Sign in
-                </Link>
-              </p>
+          
         </AnimatePresence>
+        <p className="mt-6">
+            Already Have an Account?{" "}
+            <Link
+              className="ms-3 text-blue-600 underline"
+              to={"/login"}>
+              Sign in
+            </Link>
+          </p>
       </motion.section>
-      
     </div>
   );
 };

@@ -26,6 +26,7 @@ const Navbar = () => {
     { name: "About Us", to: "/aboutUs" },
   ];
 
+  console.log(user);
   return (
     <motion.nav
       className={`shadow-lg ${scroll ? "bg-primary/60 " : "bg-primary"}`}
