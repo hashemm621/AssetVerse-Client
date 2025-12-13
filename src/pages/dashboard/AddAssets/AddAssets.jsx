@@ -8,25 +8,52 @@ import {
   FaBuilding,
   FaEnvelope,
   FaCalendarAlt,
+  FaInfo,
 } from "react-icons/fa";
 import { imageUpload } from "../../../utils/imagBB";
+import useUserInfo from "../../../hooks/useUserInfo";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
 
 const AddAssets = () => {
+  const {userInfo} = useUserInfo()
+  const axiosSecure = useAxiosSecure()
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset
   } = useForm();
 
   const handleAddAsset = async data => {
-    const {productImage,productName,productQuantity,productReturnable} =data
+
+    const {productImage,productName,productQuantity,productReturnable,productDetails} =data
     const imageFile = productImage[0]
     
 
     try {
       const imageURL = await imageUpload(imageFile)
 
-      console.log(imageURL);
+      const assetData = {
+        productName,
+        productImage:imageURL,
+        productType: productReturnable,
+        productQuantity: Number(productQuantity),
+        availableQuantity: Number(productQuantity),
+        hrEmail:userInfo.email,
+        companyName:userInfo.companyName,
+        productDetails,
+        createdAt: new Date(),
+        
+      }
+
+      const res = await axiosSecure.post('/assets',assetData)
+
+
+
+      if(res.data.insertedId){
+        toast.success('Asset added successfully')
+        reset()
+      }
 
     } catch (error) {
       console.log(error);
@@ -92,6 +119,25 @@ const AddAssets = () => {
           {errors.productReturnable?.type === "required" && (
             <p className="text-red-500 text-sm -mt-6">
               Returnable select is required
+            </p>
+          )}
+
+          {/* product details */}
+          <div className="flex items-center border border-gray-300 rounded-lg p-2">
+            <FaInfo className="text-(--color-accent) mr-3 text-xl" />
+            <textarea
+              
+              {...register("productDetails", { required: true })}
+              placeholder="Product Details"
+              rows={5}
+              maxLength={1200}
+              className="textarea input-ghost w-full focus:outline-none"
+            />
+            
+          </div>
+          {errors.productDetails?.type === "required" && (
+            <p className="text-red-500 text-sm -mt-6">
+              Product Details is required.
             </p>
           )}
 

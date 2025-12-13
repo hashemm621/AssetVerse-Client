@@ -13,6 +13,8 @@ import PrivateRoute from "./PrivateRoute";
 import HrRoute from "./HrRoute";
 import AddAssets from "../pages/dashboard/AddAssets/AddAssets";
 import ErrorPage from "../pages/errorpage/ErrorPage";
+import MyAssets from "../pages/dashboard/MyAssets";
+import MyEmployeeList from "../pages/dashboard/MyEmployList";
 
 const router = createBrowserRouter([
   {
@@ -45,6 +47,22 @@ const router = createBrowserRouter([
         element: (
           <HrRoute>
             <AddAssets />
+          </HrRoute>
+        ),
+      },
+      {
+        path: "/dashboard/myAssets",
+        element: (
+          <HrRoute>
+            <MyAssets/>
+          </HrRoute>
+        ),
+      },
+      {
+        path: "/dashboard/myEmployList",
+        element: (
+          <HrRoute>
+            <MyEmployeeList/>
           </HrRoute>
         ),
       },
