@@ -4,16 +4,16 @@ import logo from "../assets/logo.png";
 import { Link, Outlet } from "react-router";
 import useRole from "../hooks/useRole";
 import LoadingPage from "../pages/LoadingPage/LoadingPage";
-import { FaBoxOpen, FaListAlt } from "react-icons/fa";
+import { FaBoxOpen, FaListAlt, FaPrescriptionBottleAlt } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi2";
 import { GoSidebarExpand } from "react-icons/go";
 import Footer from "../pages/shared/Footer/Footer";
 
 const DashboardLayout = () => {
-  const {role,roleLoading} = useRole();
+  const { role, roleLoading } = useRole();
 
-  if(roleLoading){
-    return <LoadingPage loading={roleLoading}/>
+  if (roleLoading) {
+    return <LoadingPage loading={roleLoading} />;
   }
   return (
     <div className="drawer md:max-w-7xl mx-auto lg:drawer-open">
@@ -34,8 +34,9 @@ const DashboardLayout = () => {
               <GoSidebarExpand size={28} />
             </label>
             <div className="px-4 flex gap-2 text-xl font-bold">
-              <Link to={"/"} className="hover:scale-105">
-              
+              <Link
+                to={"/"}
+                className="hover:scale-105">
                 <img
                   className="w-10 rounded-sm"
                   src={logo}
@@ -47,12 +48,12 @@ const DashboardLayout = () => {
           </MyContainer>
         </nav>
         {/* Page content here */}
-        <Outlet/>
+        <Outlet />
 
         {/* footer */}
 
         <footer>
-          <Footer/>
+          <Footer />
         </footer>
       </div>
 
@@ -90,14 +91,14 @@ const DashboardLayout = () => {
             {/* links only hr */}
             {role === "hr" && (
               <>
-              {/* add asset */}
+                {/* add asset */}
                 <li>
                   <Link
                     to={"/dashboard/addAssets"}
                     className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
                     data-tip="Add Assets">
                     {/*  icon */}
-                    <FaBoxOpen size={24}/>
+                    <FaBoxOpen size={24} />
                     <span className="is-drawer-close:hidden">Add Assets</span>
                   </Link>
                 </li>
@@ -109,7 +110,7 @@ const DashboardLayout = () => {
                     className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
                     data-tip="My Assets">
                     {/*  icon */}
-                    <FaListAlt size={24}/>
+                    <FaListAlt size={24} />
                     <span className="is-drawer-close:hidden">My Assets</span>
                   </Link>
                 </li>
@@ -121,8 +122,28 @@ const DashboardLayout = () => {
                     className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
                     data-tip="My Employ List">
                     {/*  icon */}
-                    <HiUserGroup size={24}/>
-                    <span className="is-drawer-close:hidden">My Employ List</span>
+                    <HiUserGroup size={24} />
+                    <span className="is-drawer-close:hidden">
+                      My Employ List
+                    </span>
+                  </Link>
+                </li>
+              </>
+            )}
+
+            {/* links only employee */}
+
+            {role === "employee" && (
+              <>
+                {/* all assets */}
+                <li>
+                  <Link
+                    to={"/dashboard/allAssets"}
+                    className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                    data-tip="All Assets">
+                    {/*  icon */}
+                    <FaPrescriptionBottleAlt size={24} />
+                    <span className="is-drawer-close:hidden">All Assets</span>
                   </Link>
                 </li>
               </>

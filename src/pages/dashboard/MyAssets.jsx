@@ -324,7 +324,7 @@ const assignMutation = useMutation({
               <th>Image</th>
               <th>Name</th>
               <th>Type</th>
-              <th>Available</th>
+              <th>Stock</th>
               <th>Date</th>
               <th className="flex justify-center">Actions</th>
             </tr>
