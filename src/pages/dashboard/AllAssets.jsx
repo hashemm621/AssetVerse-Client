@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useSearchParams } from "react-router";
+import useAuth from "../../hooks/useAuth";
 
 const AllAssets = () => {
   const [selectedAsset, setSelectedAsset] = useState(null);
@@ -12,6 +13,8 @@ const AllAssets = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const type = searchParams.get("type") || "";
+  const {user} = useAuth()
+
 
   const axiosSecure = useAxiosSecure();
 
@@ -260,14 +263,13 @@ const AllAssets = () => {
               <button
                 className="btn btn-primary mt-4 w-full"
                 onClick={() => {
-                  const requesterName = "Employee Name"; // replace dynamically
-                  const requesterEmail = "employee@example.com"; // replace dynamically
+                  
                   requestMutation.mutate({
                     assetId: selectedAsset._id,
                     assetName: selectedAsset.productName,
                     assetType: selectedAsset.productType,
-                    requesterName,
-                    requesterEmail,
+                    requesterName:user.displayName,
+                    requesterEmail:user.email,
                     hrEmail: selectedAsset.hrEmail,
                     companyName: selectedAsset.companyName,
                   });

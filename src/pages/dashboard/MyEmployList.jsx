@@ -10,12 +10,12 @@ const MyEmployeeList = () => {
   const axiosSecure = useAxiosSecure();
   const { userInfo } = useUserInfo();
 
-  const { data = {}, isLoading, refetch } = useQuery({
+  const { data:employees=[], isLoading, refetch } = useQuery({
     queryKey: ["myEmployees", userInfo?.email],
     enabled: !!userInfo?.email,
     queryFn: async () => {
       const res = await axiosSecure.get(
-        `/hr/employees?hrEmail=${userInfo.email}`
+        "/affiliations/hr"
       );
       return res.data;
     },
@@ -43,6 +43,7 @@ const MyEmployeeList = () => {
     return <p className="text-center mt-10">Loading employees...</p>;
   }
 
+  console.log(employees);
   return (
     <div className="p-6 min-h-screen bg-gray-100">
       {/* Header */}
@@ -52,13 +53,13 @@ const MyEmployeeList = () => {
         </h2>
         <div className="badge badge-lg badge-primary gap-2">
           <FaUsers />
-          {data.used}/{data.limit} Employees Used
+          {employees.used}/{employees.limit} Employees Used
         </div>
       </div>
 
       {/* Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {data.employees?.map((emp) => (
+        {employees?.map((emp) => (
           <motion.div
             key={emp.email}
             whileHover={{ scale: 1.03 }}
@@ -100,7 +101,7 @@ const MyEmployeeList = () => {
       </div>
 
       {/* Empty State */}
-      {data.employees?.length === 0 && (
+      {employees?.length === 0 && (
         <p className="text-center text-gray-500 mt-10">
           No employees affiliated yet.
         </p>

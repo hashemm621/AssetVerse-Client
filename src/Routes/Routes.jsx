@@ -17,6 +17,7 @@ import MyAssets from "../pages/dashboard/MyAssets";
 import MyEmployeeList from "../pages/dashboard/MyEmployList";
 import EmployeeRoute from "./EmployRoute";
 import AllAssets from "../pages/dashboard/AllAssets";
+import AllRequests from "../pages/dashboard/AllRequests";
 
 const router = createBrowserRouter([
   {
@@ -65,6 +66,14 @@ const router = createBrowserRouter([
         element: (
           <HrRoute>
             <MyEmployeeList/>
+          </HrRoute>
+        ),
+      },
+      {
+        path: "/dashboard/allRequests",
+        element: (
+          <HrRoute>
+            <AllRequests/>
           </HrRoute>
         ),
       },

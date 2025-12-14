@@ -22,8 +22,10 @@ const Navbar = () => {
     { name: "Home", to: "/" },
     { name: "Features", to: "/features" },
     { name: "FAQ", to: "/FAQ" },
+    {name:'DashBoard', to:'/dashboard'},
     { name: "Testimonials", to: "/testimonials" },
     { name: "About Us", to: "/aboutUs" },
+    
   ];
 
 
