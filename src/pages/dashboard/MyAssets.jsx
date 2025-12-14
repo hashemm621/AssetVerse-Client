@@ -8,6 +8,7 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useUserInfo from "../../hooks/useUserInfo";
 import LoadingPage from "../LoadingPage/LoadingPage";
 import Swal from "sweetalert2";
+import { LucideAirVent } from "lucide-react";
 
 const MyAssets = () => {
   const { userInfo, isLoading: userLoading } = useUserInfo();
@@ -15,8 +16,8 @@ const MyAssets = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
   const queryClient = useQueryClient();
-
-
+  const [selectedAsset, setSelectedAsset] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: assets = {}, isLoading } = useQuery({
     queryKey: ["hrAssets", userInfo?.email, page],
@@ -30,8 +31,24 @@ const MyAssets = () => {
     },
   });
 
-    // delete hooks
-    const deleteMutation = useMutation({
+  // update hooks
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }) => {
+      const res = await axiosSecure.patch(`/assets/${id}`, data);
+      return res.data;
+    },
+    onSuccess: () => {
+      Swal.fire("Updated!", "Asset updated successfully.", "success");
+      queryClient.invalidateQueries({ queryKey: ["hrAssets"] });
+      setIsModalOpen(false);
+    },
+    onError: () => {
+      Swal.fire("Error!", "Failed to update asset.", "error");
+    },
+  });
+
+  // delete hooks
+  const deleteMutation = useMutation({
     mutationFn: async id => {
       const res = await axiosSecure.delete(`/assets/${id}`);
       return res.data;
@@ -57,9 +74,9 @@ const MyAssets = () => {
 
   // handle update Assets
   const handleUpdate = asset => {
-    console.log(asset);
+    setSelectedAsset(asset);
+    setIsModalOpen(true);
   };
-
 
   // handle Delete
   const handleDelete = id => {
@@ -83,6 +100,114 @@ const MyAssets = () => {
       <h2 className="text-2xl md:text-4xl font-bold mb-6 text-center text-(--color-primary)">
         HR Asset List
       </h2>
+
+      {/* updated modal */}
+      {isModalOpen && selectedAsset && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-lg">
+            <h3 className="text-xl font-bold mb-4">Update Asset</h3>
+
+            {/* Product Name */}
+            <label>Product Name:</label>
+            <input
+              className="input input-bordered w-full mb-5"
+              value={selectedAsset.productName}
+              onChange={e =>
+                setSelectedAsset({
+                  ...selectedAsset,
+                  productName: e.target.value,
+                })
+              }
+              placeholder="Product Name"
+            />
+
+            {/* Product Image */}
+            <label>Product Details:</label>
+            <input
+              className="input input-bordered w-full mb-3"
+              value={selectedAsset.productDetails}
+              onChange={e =>
+                setSelectedAsset({
+                  ...selectedAsset,
+                  productImage: e.target.value,
+                })
+              }
+            />
+
+            {/* Product Type */}
+            <label>Product Type:</label>
+            <select
+              className="select select-bordered w-full mb-3"
+              value={selectedAsset.productType}
+              onChange={e =>
+                setSelectedAsset({
+                  ...selectedAsset,
+                  productType: e.target.value,
+                })
+              }>
+              <option value="returnable">Returnable</option>
+              <option value="non-returnable">Non-returnable</option>
+            </select>
+
+            {/* Product Quantity */}
+            <label>Product Quantity:</label>
+            <input
+              type="number"
+              className="input input-bordered w-full mb-3"
+              value={selectedAsset.productQuantity}
+              onChange={e =>
+                setSelectedAsset({
+                  ...selectedAsset,
+                  productQuantity: Number(e.target.value),
+                })
+              }
+              placeholder="Total Quantity"
+            />
+
+            {/* Available Quantity */}
+            <label>Available Quantity</label>
+            <input
+              type="number"
+              className="input input-bordered w-full mb-4"
+              value={selectedAsset.availableQuantity}
+              onChange={e =>
+                setSelectedAsset({
+                  ...selectedAsset,
+                  availableQuantity: Number(e.target.value),
+                })
+              }
+              placeholder="Available Quantity"
+            />
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-3">
+              <button
+                className="btn btn-outline"
+                onClick={() => setIsModalOpen(false)}>
+                Cancel
+              </button>
+
+              <button
+                className="btn btn-primary"
+                disabled={updateMutation.isPending}
+                onClick={() =>
+                  updateMutation.mutate({
+                    id: selectedAsset._id,
+                    data: {
+                      productName: selectedAsset.productName,
+                      productDetails: selectedAsset.productDetails,
+                      productType: selectedAsset.productType,
+                      productQuantity: selectedAsset.productQuantity,
+                      availableQuantity: selectedAsset.availableQuantity,
+                    },
+                  })
+                }>
+                {updateMutation.isPending ? "Updating..." : "Update Asset"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -134,7 +259,13 @@ const MyAssets = () => {
                     className="btn btn-sm btn-error gap-2"
                     disabled={deleteMutation.isPending}
                     onClick={() => handleDelete(asset._id)}>
-                     {deleteMutation.isPending ? "Deleting..." : <span className="flex justify-center items-center gap-1"><FaTrashAlt /> Delete</span>}
+                    {deleteMutation.isPending ? (
+                      "Deleting..."
+                    ) : (
+                      <span className="flex justify-center items-center gap-1">
+                        <FaTrashAlt /> Delete
+                      </span>
+                    )}
                   </button>
                 </td>
               </motion.tr>
@@ -186,9 +317,15 @@ const MyAssets = () => {
 
               <button
                 className="btn btn-sm btn-error gap-2"
-                 disabled={deleteMutation.isPending}
+                disabled={deleteMutation.isPending}
                 onClick={() => handleDelete(asset._id)}>
-                {deleteMutation.isPending ? "Deleting..." : <span className="flex justify-center items-center gap-1"><FaTrashAlt/> Delete</span> }
+                {deleteMutation.isPending ? (
+                  "Deleting..."
+                ) : (
+                  <span className="flex justify-center items-center gap-1">
+                    <FaTrashAlt /> Delete
+                  </span>
+                )}
               </button>
             </div>
           </motion.div>
