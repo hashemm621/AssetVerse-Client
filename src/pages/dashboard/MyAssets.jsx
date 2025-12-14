@@ -15,6 +15,9 @@ const MyAssets = () => {
   const axiosSecure = useAxiosSecure();
   const [page, setPage] = useState(1);
   const limit = 10;
+  const [assignModalOpen, setAssignModalOpen] = useState(false);
+const [assignAsset, setAssignAsset] = useState(null);
+const [selectedEmployee, setSelectedEmployee] = useState("");
   const queryClient = useQueryClient();
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,6 +33,34 @@ const MyAssets = () => {
       return res.data;
     },
   });
+
+  // assign employ hooks
+const { data: employees = [] } = useQuery({
+  queryKey: ["affiliatedEmployees"],
+  enabled: !!userInfo?.email,
+  queryFn: async () => {
+    const res = await axiosSecure.get("/affiliations/hr");
+    return res.data;
+  },
+});
+
+const assignMutation = useMutation({
+  mutationFn: async () => {
+    return axiosSecure.patch(`/assets/assign/${assignAsset._id}`, {
+      employeeEmail: selectedEmployee.email,
+      employeeName: selectedEmployee.name,
+    });
+  },
+  onSuccess: () => {
+    toast.success("Asset assigned successfully");
+    queryClient.invalidateQueries({ queryKey: ["hrAssets"] });
+    setAssignModalOpen(false);
+    setSelectedEmployee("");
+  },
+  onError: err => {
+    toast.error(err?.response?.data?.message || "Assign failed");
+  },
+});
 
   // update hooks
   const updateMutation = useMutation({
@@ -69,8 +100,10 @@ const MyAssets = () => {
   const totalPages = assets.totalPages || 1;
 
   const handleAssign = asset => {
-    toast("Open assign asset modal 🔥", asset.productName);
-  };
+  setAssignAsset(asset);
+  setAssignModalOpen(true);
+};
+
 
   // handle update Assets
   const handleUpdate = asset => {
@@ -94,6 +127,23 @@ const MyAssets = () => {
       }
     });
   };
+
+  // handle assign comfirmation
+  const handleConfirmAssign = () => {
+  Swal.fire({
+    title: "Assign Asset?",
+    text: `Are you sure you want to assign "${assignAsset.productName}" to ${selectedEmployee.name}?`,
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Yes, Assign",
+    cancelButtonText: "Cancel",
+    confirmButtonColor: "#1E3A8A",
+  }).then(result => {
+    if (result.isConfirmed) {
+      assignMutation.mutate();
+    }
+  });
+};
 
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
@@ -208,6 +258,60 @@ const MyAssets = () => {
           </div>
         </div>
       )}
+
+      {/* assign employ */}
+      {assignModalOpen && assignAsset && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      className="bg-white rounded-xl p-6 w-full max-w-md"
+    >
+      <h3 className="text-xl font-bold mb-4">
+        Assign {assignAsset.productName}
+      </h3>
+
+      <select
+        className="select select-bordered w-full mb-4"
+        value={selectedEmployee?.email || ""}
+        onChange={e => {
+          const emp = employees.find(
+            emp => emp.employeeEmail === e.target.value
+          );
+          setSelectedEmployee({
+            email: emp.employeeEmail,
+            name: emp.employeeName,
+          });
+        }}
+      >
+        <option value="">Select Employee</option>
+        {employees.map(emp => (
+          <option key={emp._id} value={emp.employeeEmail}>
+            {emp.employeeName} ({emp.employeeEmail})
+          </option>
+        ))}
+      </select>
+
+      <div className="flex justify-end gap-3">
+        <button
+          className="btn btn-outline"
+          onClick={() => setAssignModalOpen(false)}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="btn btn-primary"
+          disabled={!selectedEmployee || assignMutation.isPending}
+          onClick={handleConfirmAssign}
+        >
+          {assignMutation.isPending ? "Assigning..." : "Assign"}
+        </button>
+      </div>
+    </motion.div>
+  </div>
+)}
+
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
