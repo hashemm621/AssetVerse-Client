@@ -5,10 +5,12 @@ import logo from "../assets/logo.png";
 import useRole from "../hooks/useRole";
 import LoadingPage from "../pages/LoadingPage/LoadingPage";
 import Footer from "../pages/shared/Footer/Footer";
-import { FaBoxOpen, FaListAlt, FaPrescriptionBottleAlt } from "react-icons/fa";
+import { FaBoxOpen, FaListAlt, FaPrescriptionBottleAlt, FaUsers } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi2";
 import { GoSidebarExpand } from "react-icons/go";
 import { MdRequestQuote } from "react-icons/md";
+import { VscGitPullRequestGoToChanges } from "react-icons/vsc";
+
 
 const DashboardLayout = () => {
   const { role, roleLoading } = useRole();
@@ -37,7 +39,7 @@ const DashboardLayout = () => {
       <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content">
         {/* Navbar */}
-        <nav className="bg-primary">
+        <nav className="bg-primary sticky top-0 z-50">
           <MyContainer className="navbar text-white">
             <label
               htmlFor="my-drawer-4"
@@ -71,7 +73,7 @@ const DashboardLayout = () => {
           aria-label="close sidebar"
           className="drawer-overlay"
         ></label>
-        <div className="flex min-h-full flex-col items-start bg-secondary text-base-100 is-drawer-close:w-14 is-drawer-open:w-64">
+        <div className="flex mt-15 min-h-full flex-col items-start bg-secondary text-base-100 is-drawer-close:w-14 is-drawer-open:w-64">
           <ul className="menu w-full grow">
             <li>
               <Link
@@ -153,6 +155,7 @@ const DashboardLayout = () => {
 
             {/* Employee links */}
             {role === "employee" && (
+              <>
               <li>
                 <Link
                   to={"/dashboard/allAssets"}
@@ -163,6 +166,29 @@ const DashboardLayout = () => {
                   <span className="is-drawer-close:hidden">All Assets</span>
                 </Link>
               </li>
+
+              <li>
+                <Link
+                  to={"/dashboard/myRequests"}
+                  className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                  data-tip="My Requests"
+                >
+                  <VscGitPullRequestGoToChanges size={24} />
+                  <span className="is-drawer-close:hidden">My Requests</span>
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to={"/dashboard/myTeam"}
+                  className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                  data-tip="My Team"
+                >
+                  <FaUsers size={24} />
+                  <span className="is-drawer-close:hidden">My Team</span>
+                </Link>
+              </li>
+              </>
             )}
 
 
