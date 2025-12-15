@@ -24,7 +24,7 @@ const MyEmployeeList = () => {
     },
   });
 
-  console.log(employees);
+
 
  const handleRemove = async (emp) => {
   const result = await Swal.fire({

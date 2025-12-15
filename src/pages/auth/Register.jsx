@@ -83,7 +83,7 @@ const Register = () => {
   const handleEmployeeRegister = async data => {
     const { name, image, email, password } = data;
     const imageFile = image[0];
-    console.log("Employ data ==>", { name, imageFile, email, password });
+    
 
     try {
       const imageURL = await imageUpload(imageFile);

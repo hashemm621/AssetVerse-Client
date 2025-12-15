@@ -10,35 +10,34 @@ const EmployeeMyTeam = () => {
   const { userInfo } = useUserInfo();
   const [selectedCompany, setSelectedCompany] = useState("");
 
-  // fetch team members
-  const { data: team = [], isLoading } = useQuery({
-    queryKey: ["myTeam", userInfo?.email],
+  // Fetch employee's team by company
+  const { data: companyTeams = [], isLoading } = useQuery({
+    queryKey: ["employeeTeam", userInfo?.email],
     queryFn: async () => {
-      const res = await axiosSecure.get("/affiliations/hr");
-      return res.data;
+      const res = await axiosSecure.get("/affiliations/employee-team");
+      return res.data; // [{ companyName, employees: [...] }]
     },
     enabled: !!userInfo?.email,
   });
 
-  // unique company list, memoized
-  const companies = useMemo(() => {
-    return [...new Set(team.map((emp) => emp.companyName).filter(Boolean))];
-  }, [team]);
+  // List of companies
+  const companies = useMemo(() => companyTeams.map((c) => c.companyName), [companyTeams]);
 
-  // auto select first company when companies change
+  // Auto select first company
   useEffect(() => {
-    if (companies.length > 0) {
-      setSelectedCompany((prev) => prev || companies[0]);
-    }
-  }, [companies]);
+    if (companies.length > 0 && !selectedCompany) setSelectedCompany(companies[0]);
+  }, [companies, selectedCompany]);
 
-  // filter team by selected company
-  const filteredTeam = useMemo(
-    () => team.filter((emp) => emp.companyName === selectedCompany),
-    [team, selectedCompany]
-  );
+  // Employees for selected company (exclude current user)
+  const filteredTeam = useMemo(() => {
+    return (
+      companyTeams.find((c) => c.companyName === selectedCompany)?.employees.filter(
+        (emp) => emp.employeeEmail !== userInfo?.email
+      ) || []
+    );
+  }, [companyTeams, selectedCompany, userInfo]);
 
-  // birthdays this month
+  // Upcoming birthdays
   const currentMonth = new Date().getMonth();
   const birthdays = useMemo(
     () =>
@@ -52,13 +51,15 @@ const EmployeeMyTeam = () => {
   if (!userInfo) return <p className="text-center mt-10">Loading user info...</p>;
   if (isLoading) return <p className="text-center mt-10">Loading team...</p>;
 
+
+
   return (
     <div className="p-4 md:p-8">
       <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
         <FaUsers /> My Team
       </h2>
 
-      {/* Company Select */}
+      {/* Company Dropdown */}
       {companies.length > 1 && (
         <select
           className="select select-bordered mb-6 max-w-xs"
@@ -94,7 +95,7 @@ const EmployeeMyTeam = () => {
                 <h3 className="font-semibold text-lg mt-2">{emp.employeeName}</h3>
                 <p className="text-sm text-gray-500">{emp.employeeEmail}</p>
                 <span className="badge badge-outline mt-2">
-                  {emp.position || "Employee"}
+                  {emp.companyName}
                 </span>
               </div>
             </motion.div>
@@ -112,7 +113,6 @@ const EmployeeMyTeam = () => {
           <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
             <FaBirthdayCake /> Upcoming Birthdays
           </h3>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {birthdays.map((emp) => (
               <div
@@ -135,6 +135,7 @@ const EmployeeMyTeam = () => {
                       month: "long",
                     })}
                   </p>
+                  <p className="text-xs text-gray-400">{emp.companyName}</p>
                 </div>
               </div>
             ))}
