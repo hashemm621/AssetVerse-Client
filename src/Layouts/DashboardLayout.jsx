@@ -10,6 +10,7 @@ import { HiUserGroup } from "react-icons/hi2";
 import { GoSidebarExpand } from "react-icons/go";
 import { MdRequestQuote } from "react-icons/md";
 import { VscGitPullRequestGoToChanges } from "react-icons/vsc";
+import { HistoryIcon, LucidePackage } from "lucide-react";
 
 
 const DashboardLayout = () => {
@@ -148,6 +149,27 @@ const DashboardLayout = () => {
                   >
                     <MdRequestQuote size={24} />
                     <span className="is-drawer-close:hidden">All Requests</span>
+                  </Link>
+                </li>
+
+                <li>
+                  <Link
+                    to={"/dashboard/myPackages"}
+                    className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                    data-tip="My Packages"
+                  >
+                    <LucidePackage  size={24} />
+                    <span className="is-drawer-close:hidden">My Packages</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"/dashboard/payment-history"}
+                    className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                    data-tip="Payment History"
+                  >
+                    <HistoryIcon  size={24} />
+                    <span className="is-drawer-close:hidden">Payment History</span>
                   </Link>
                 </li>
               </>

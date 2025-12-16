@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { FaTrashAlt, FaUsers } from "react-icons/fa";
@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 const MyEmployeeList = () => {
   const axiosSecure = useAxiosSecure();
   const { userInfo } = useUserInfo();
+  const limitAlertShown = useRef(false);
 
   const {
     data: employees = [],
@@ -24,33 +25,52 @@ const MyEmployeeList = () => {
     },
   });
 
+  const handleRemove = async emp => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `Remove ${emp.employeeName} from your company?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#e11d48",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Yes, remove",
+      cancelButtonText: "Cancel",
+    });
 
+    if (!result.isConfirmed) return;
 
- const handleRemove = async (emp) => {
-  const result = await Swal.fire({
-    title: "Are you sure?",
-    text: `Remove ${emp.employeeName} from your company?`,
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#e11d48",
-    cancelButtonColor: "#6b7280",
-    confirmButtonText: "Yes, remove",
-    cancelButtonText: "Cancel",
-  });
+    try {
+      await axiosSecure.patch(`/affiliations/remove/${emp.employeeEmail}`);
 
-  if (!result.isConfirmed) return;
+      toast.success("Employee removed successfully");
+      refetch();
+    } catch (error) {
+      toast.error("Failed to remove employee", error);
+    }
+  };
 
-  try {
-    await axiosSecure.patch(
-      `/affiliations/remove/${emp.employeeEmail}`
-    );
+  useEffect(() => {
+    if (
+      employees.length >= userInfo?.package?.employeesLimit &&
+      !limitAlertShown.current
+    ) {
+      limitAlertShown.current = true;
 
-    toast.success("Employee removed successfully");
-    refetch();
-  } catch (error) {
-    toast.error("Failed to remove employee",error);
-  }
-};
+      Swal.fire({
+        title: "Employee limit reached!",
+        text: "You have reached your current package limit. Upgrade to add more employees.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Upgrade Package",
+        cancelButtonText: "OK",
+        confirmButtonColor: "#2563eb",
+      }).then(result => {
+        if (result.isConfirmed) {
+          window.location.href = "/dashboard/packages";
+        }
+      });
+    }
+  }, [employees, userInfo]);
 
   if (isLoading) {
     return <p className="text-center mt-10">Loading employees...</p>;
@@ -66,28 +86,29 @@ const MyEmployeeList = () => {
 
         <div className="badge badge-lg badge-primary gap-2">
           <FaUsers />
-          {employees.length} Employees
+          {employees.length} / {userInfo?.package?.employeesLimit} Employees
         </div>
       </div>
 
       {/* Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {employees.map((emp) => (
+        {employees.map(emp => (
           <motion.div
             key={emp._id}
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.2 }}
-            className="bg-white rounded-2xl shadow-md p-5 flex flex-col items-center text-center"
-          >
+            className="bg-white rounded-2xl shadow-md p-5 flex flex-col items-center text-center">
             {/* Avatar (no company logo) */}
             <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-2xl font-bold text-primary">
-              <img className="w-19 h-19 rounded-full" src={emp.photo} alt="employee image" />
+              <img
+                className="w-19 h-19 rounded-full"
+                src={emp.photo}
+                alt="employee image"
+              />
             </div>
 
             {/* Info */}
-            <h3 className="mt-3 font-semibold text-lg">
-              {emp.employeeName}
-            </h3>
+            <h3 className="mt-3 font-semibold text-lg">{emp.employeeName}</h3>
 
             <p className="text-sm text-gray-500 break-all">
               {emp.employeeEmail}
@@ -96,8 +117,7 @@ const MyEmployeeList = () => {
             <div className="w-full border-t my-3"></div>
 
             <p className="text-sm">
-              <span className="font-medium">Company:</span>{" "}
-              {emp.companyName}
+              <span className="font-medium">Company:</span> {emp.companyName}
             </p>
 
             <p className="text-sm">
@@ -111,19 +131,15 @@ const MyEmployeeList = () => {
 
             <span
               className={`mt-2 badge ${
-                emp.status === "active"
-                  ? "badge-success"
-                  : "badge-ghost"
-              }`}
-            >
+                emp.status === "active" ? "badge-success" : "badge-ghost"
+              }`}>
               {emp.status}
             </span>
 
             {/* Action */}
             <button
               onClick={() => handleRemove(emp)}
-              className="btn btn-sm btn-error text-white mt-4 w-full"
-            >
+              className="btn btn-sm btn-error text-white mt-4 w-full">
               <FaTrashAlt className="mr-2" />
               Remove
             </button>

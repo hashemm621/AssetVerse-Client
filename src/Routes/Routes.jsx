@@ -20,6 +20,9 @@ import AllAssets from "../pages/dashboard/AllAssets";
 import AllRequests from "../pages/dashboard/AllRequests";
 import EmployeeRequestAssets from "../pages/dashboard/EmployeeRequestAssets";
 import EmployeeMyTeam from "../pages/dashboard/EmployeeMyTeam";
+import Packages from "../pages/dashboard/Packages";
+import PaymentSuccess from "../pages/dashboard/PaymentSuccess";
+import PaymentHistory from "../pages/dashboard/PaymentHistory";
 
 const router = createBrowserRouter([
   {
@@ -59,7 +62,7 @@ const router = createBrowserRouter([
         path: "/dashboard/myAssets",
         element: (
           <HrRoute>
-            <MyAssets/>
+            <MyAssets />
           </HrRoute>
         ),
       },
@@ -67,7 +70,15 @@ const router = createBrowserRouter([
         path: "/dashboard/myEmployList",
         element: (
           <HrRoute>
-            <MyEmployeeList/>
+            <MyEmployeeList />
+          </HrRoute>
+        ),
+      },
+      {
+        path: "/dashboard/myPackages",
+        element: (
+          <HrRoute>
+            <Packages />
           </HrRoute>
         ),
       },
@@ -75,7 +86,23 @@ const router = createBrowserRouter([
         path: "/dashboard/allRequests",
         element: (
           <HrRoute>
-            <AllRequests/>
+            <AllRequests />
+          </HrRoute>
+        ),
+      },
+      {
+        path: "/dashboard/payment-success",
+        element: (
+          <HrRoute>
+            <PaymentSuccess />
+          </HrRoute>
+        ),
+      },
+      {
+        path: "/dashboard/payment-history",
+        element: (
+          <HrRoute>
+            <PaymentHistory />
           </HrRoute>
         ),
       },
@@ -83,7 +110,7 @@ const router = createBrowserRouter([
         path: "/dashboard/allAssets",
         element: (
           <EmployeeRoute>
-            <AllAssets/>
+            <AllAssets />
           </EmployeeRoute>
         ),
       },
@@ -91,7 +118,7 @@ const router = createBrowserRouter([
         path: "/dashboard/myRequests",
         element: (
           <EmployeeRoute>
-            <EmployeeRequestAssets/>
+            <EmployeeRequestAssets />
           </EmployeeRoute>
         ),
       },
@@ -99,7 +126,7 @@ const router = createBrowserRouter([
         path: "/dashboard/myTeam",
         element: (
           <EmployeeRoute>
-            <EmployeeMyTeam/>
+            <EmployeeMyTeam />
           </EmployeeRoute>
         ),
       },

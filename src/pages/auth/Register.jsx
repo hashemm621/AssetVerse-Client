@@ -117,7 +117,7 @@ const Register = () => {
           toast.success("Register Successful");
         }
       });
-      console.log(result);
+
     } catch (error) {
       console.log(error);
       toast.error(error?.message);

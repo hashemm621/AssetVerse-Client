@@ -4,17 +4,20 @@ import { FaCheck, FaTimes, FaEye } from "react-icons/fa";
 import toast from "react-hot-toast";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { motion, AnimatePresence } from "framer-motion";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router";
 
 const AllRequests = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
+  const navigate = useNavigate()
   const [selectedRequest, setSelectedRequest] = useState(null);
 
   // Fetch all requests for HR
   const { data, isLoading, isError } = useQuery({
     queryKey: ["requests"],
     queryFn: async () => {
-      const res = await axiosSecure.get("/requests/hr"); // backend route to get requests for this HR
+      const res = await axiosSecure.get("/requests/hr");
       return res.data;
     },
   });
@@ -24,14 +27,60 @@ const AllRequests = () => {
   // Approve / Reject mutation
   const updateRequestMutation = useMutation({
     mutationFn: ({ id, action }) =>
-      axiosSecure.patch(`/requests/${id}`, { action, hrEmail: "hr@example.com" }), // replace with HR email dynamically
+      axiosSecure.patch(`/requests/${id}`, { action }), // HR email taken from token
     onSuccess: () => {
       toast.success("Request updated!");
       queryClient.invalidateQueries(["requests"]);
       setSelectedRequest(null);
     },
-    onError: () => toast.error("Update failed"),
+    onError: (err) => {
+      if (err?.response?.status === 403) {
+        Swal.fire({
+          icon: "warning",
+          title: "Employee limit exceeded",
+          text: "You have reached your package limit. Please upgrade your package first.",
+        });
+      } else {
+        toast.error("Update failed");
+      }
+    },
   });
+
+  // Handle approve with SweetAlert limit check
+  const handleApprove = async (req) => {
+  try {
+    const hrRes = await axiosSecure.get(`/users/${req.hrEmail}`);
+    const hrPackage = hrRes.data.package;
+
+    const empRes = await axiosSecure.get("/affiliations/hr");
+    const currentCount = empRes.data.length;
+
+    if (currentCount >= hrPackage.employeesLimit) {
+      const result = await Swal.fire({
+        title: "Employee limit exceeded",
+        text: "You have reached your employee limit. Upgrade package to add more employees?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Upgrade Package",
+        cancelButtonText: "Cancel",
+      });
+
+      if (result.isConfirmed) {
+        setTimeout(() => {
+          navigate("/dashboard/myPackages");
+        }, 100);
+      }
+      return; 
+    }
+
+    // Approve request
+    updateRequestMutation.mutate({ id: req._id, action: "approved" });
+  } catch (error) {
+    console.error(error);
+    toast.error("Check failed");
+  }
+};
+
 
   if (isLoading) return <div className="text-center py-10">Loading...</div>;
   if (isError) return <div className="text-center py-10">Failed to load requests</div>;
@@ -76,13 +125,15 @@ const AllRequests = () => {
                     <>
                       <button
                         className="btn btn-sm btn-success"
-                        onClick={() => updateRequestMutation.mutate({ id: req._id, action: "approved" })}
+                        onClick={() => handleApprove(req)}
                       >
                         <FaCheck />
                       </button>
                       <button
                         className="btn btn-sm btn-error"
-                        onClick={() => updateRequestMutation.mutate({ id: req._id, action: "rejected" })}
+                        onClick={() =>
+                          updateRequestMutation.mutate({ id: req._id, action: "rejected" })
+                        }
                       >
                         <FaTimes />
                       </button>
