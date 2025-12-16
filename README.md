@@ -8,51 +8,51 @@ AssetVerse is a full‑stack **Asset Management System** designed for organizati
 
 ### 🔐 Authentication & Roles
 
-* Firebase Authentication with JWT verification
-* Role‑based access control (HR & Employee)
-* Secure API protection using middleware
+- Firebase Authentication with JWT verification
+- Role‑based access control (HR & Employee)
+- Secure API protection using middleware
 
 ### 📦 Package & Subscription Management
 
-* Default **Free Package** (Employee limit: 5)
-* Paid packages with employee limits
-* Stripe Checkout integration
-* Duplicate payment prevention using MongoDB unique index
-* Package downgrade support (auto deactivates extra employees)
+- Default **Free Package** (Employee limit: 5)
+- Paid packages with employee limits
+- Stripe Checkout integration
+- Duplicate payment prevention using MongoDB unique index
+- Package downgrade support (auto deactivates extra employees)
 
 ### 💳 Payment System
 
-* Stripe payment session creation
-* Unique `trackingId` for every transaction
-* Payment history per HR
-* MongoDB unique index to prevent duplicate payments
+- Stripe payment session creation
+- Unique `trackingId` for every transaction
+- Payment history per HR
+- MongoDB unique index to prevent duplicate payments
 
 ### 🏢 Asset Management (HR)
 
-* Add, update, delete company assets
-* Assign assets to employees
-* Track available & assigned quantities
-* Returnable / Non‑returnable asset handling
+- Add, update, delete company assets
+- Assign assets to employees
+- Track available & assigned quantities
+- Returnable / Non‑returnable asset handling
 
 ### 👥 Employee Management
 
-* Employee affiliation with HR/company
-* Auto employee limit enforcement based on package
-* Employee activation / deactivation
+- Employee affiliation with HR/company
+- Auto employee limit enforcement based on package
+- Employee activation / deactivation
 
 ### 📝 Asset Request Workflow
 
-* Employees can request assets
-* HR can approve or reject requests
-* Auto asset assignment on approval
-* Prevent duplicate or invalid requests
+- Employees can request assets
+- HR can approve or reject requests
+- Auto asset assignment on approval
+- Prevent duplicate or invalid requests
 
 ### 📊 Dashboard & History
 
-* Asset history
-* Payment history
-* Assigned asset tracking
-* Team & company overview
+- Asset history
+- Payment history
+- Assigned asset tracking
+- Team & company overview
 
 ---
 
@@ -60,32 +60,32 @@ AssetVerse is a full‑stack **Asset Management System** designed for organizati
 
 ### Frontend
 
-* React
-* React Router
-* TanStack Query
-* Tailwind CSS
-* Framer Motion
-* Axios
+- React
+- React Router
+- TanStack Query
+- Tailwind CSS
+- Framer Motion
+- Axios
 
 ### Backend
 
-* Node.js
-* Express.js
-* MongoDB (Native Driver)
-* Firebase Admin SDK
-* Stripe API
+- Node.js
+- Express.js
+- MongoDB (Native Driver)
+- Firebase Admin SDK
+- Stripe API
 
 ---
 
 ## 🗂️ Database Collections
 
-* `users`
-* `assets`
-* `assignedAssets`
-* `employeeAffiliations`
-* `assetsRequest`
-* `packages`
-* `payments`
+- `users`
+- `assets`
+- `assignedAssets`
+- `employeeAffiliations`
+- `assetsRequest`
+- `packages`
+- `payments`
 
 ---
 
@@ -127,23 +127,20 @@ npm run dev
 Server will start on:
 
 ```
-http://localhost:3000
+https://asset-verse-server-rust.vercel.app
 ```
 
 ---
 
 ## 🔐 Payment Duplicate Prevention Logic
 
-* Each Stripe checkout generates a unique `trackingId`
-* `payments` collection has a **unique index** on `trackingId`
-* Backend checks existing payment before insert
-* Prevents duplicate API calls or page refresh issues
+- Each Stripe checkout generates a unique `trackingId`
+- `payments` collection has a **unique index** on `trackingId`
+- Backend checks existing payment before insert
+- Prevents duplicate API calls or page refresh issues
 
 ```js
-await paymentsCollection.createIndex(
-  { trackingId: 1 },
-  { unique: true }
-);
+await paymentsCollection.createIndex({ trackingId: 1 }, { unique: true });
 ```
 
 ---
@@ -170,19 +167,19 @@ await paymentsCollection.createIndex(
 
 ## 🔒 Security Best Practices
 
-* Token verification using Firebase Admin
-* Protected routes with middleware
-* Server‑side validation for sensitive actions
-* No trust on client‑side data
+- Token verification using Firebase Admin
+- Protected routes with middleware
+- Server‑side validation for sensitive actions
+- No trust on client‑side data
 
 ---
 
 ## 📈 Future Improvements
 
-* Stripe Webhook integration
-* Admin analytics dashboard
-* Email notifications
-* Role‑based permission expansion
+- Stripe Webhook integration
+- Admin analytics dashboard
+- Email notifications
+- Role‑based permission expansion
 
 ---
 
