@@ -5,13 +5,17 @@ import logo from "../assets/logo.png";
 import useRole from "../hooks/useRole";
 import LoadingPage from "../pages/LoadingPage/LoadingPage";
 import Footer from "../pages/shared/Footer/Footer";
-import { FaBoxOpen, FaListAlt, FaPrescriptionBottleAlt, FaUsers } from "react-icons/fa";
+import {
+  FaBoxOpen,
+  FaListAlt,
+  FaPrescriptionBottleAlt,
+  FaUsers,
+} from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi2";
 import { GoSidebarExpand } from "react-icons/go";
 import { MdRequestQuote } from "react-icons/md";
 import { VscGitPullRequestGoToChanges } from "react-icons/vsc";
 import { HistoryIcon, LucidePackage } from "lucide-react";
-
 
 const DashboardLayout = () => {
   const { role, roleLoading } = useRole();
@@ -20,7 +24,6 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     if (!roleLoading) {
-      
       if (location.pathname === "/dashboard") {
         if (role === "hr") {
           navigate("/dashboard/myAssets", { replace: true });
@@ -37,7 +40,11 @@ const DashboardLayout = () => {
 
   return (
     <div className="drawer md:max-w-7xl mx-auto lg:drawer-open">
-      <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
+      <input
+        id="my-drawer-4"
+        type="checkbox"
+        className="drawer-toggle"
+      />
       <div className="drawer-content">
         {/* Navbar */}
         <nav className="bg-primary sticky top-0 z-50">
@@ -45,13 +52,18 @@ const DashboardLayout = () => {
             <label
               htmlFor="my-drawer-4"
               aria-label="open sidebar"
-              className="btn btn-square btn-ghost bg-transparent text-white border-0 shadow-none hover:scale-105"
-            >
+              className="btn btn-square btn-ghost bg-transparent text-white border-0 shadow-none hover:scale-105">
               <GoSidebarExpand size={28} />
             </label>
             <div className="px-4 flex gap-2 text-xl font-bold">
-              <Link to={"/"} className="hover:scale-105">
-                <img className="w-10 rounded-sm" src={logo} alt="brand logo" />
+              <Link
+                to={"/"}
+                className="hover:scale-105">
+                <img
+                  className="w-10 rounded-sm"
+                  src={logo}
+                  alt="brand logo"
+                />
               </Link>{" "}
               <span>assetVerse Dashboard</span>
             </div>
@@ -72,16 +84,14 @@ const DashboardLayout = () => {
         <label
           htmlFor="my-drawer-4"
           aria-label="close sidebar"
-          className="drawer-overlay"
-        ></label>
-        <div className="flex mt-15 min-h-full flex-col items-start bg-secondary text-base-100 is-drawer-close:w-14 is-drawer-open:w-64">
+          className="drawer-overlay"></label>
+        <div className="flex pt-15 min-h-full flex-col items-start bg-secondary text-base-100 is-drawer-close:w-14 is-drawer-open:w-64">
           <ul className="menu w-full grow">
             <li>
               <Link
                 to={"/"}
                 className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                data-tip="Homepage"
-              >
+                data-tip="Homepage">
                 {/* Home icon */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -91,8 +101,7 @@ const DashboardLayout = () => {
                   strokeWidth="2"
                   fill="none"
                   stroke="currentColor"
-                  className="my-1.5 inline-block size-6"
-                >
+                  className="my-1.5 inline-block size-6">
                   <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path>
                   <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                 </svg>
@@ -103,14 +112,12 @@ const DashboardLayout = () => {
             {/* HR links */}
             {role === "hr" && (
               <>
-
-              {/* add asstest */}
+                {/* add asstest */}
                 <li>
                   <Link
                     to={"/dashboard/addAssets"}
                     className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                    data-tip="Add Assets"
-                  >
+                    data-tip="Add Assets">
                     <FaBoxOpen size={24} />
                     <span className="is-drawer-close:hidden">Add Assets</span>
                   </Link>
@@ -121,22 +128,22 @@ const DashboardLayout = () => {
                   <Link
                     to={"/dashboard/myAssets"}
                     className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                    data-tip="My Assets"
-                  >
+                    data-tip="My Assets">
                     <FaListAlt size={24} />
                     <span className="is-drawer-close:hidden">My Assets</span>
                   </Link>
                 </li>
 
-                  {/* employList */}
+                {/* employList */}
                 <li>
                   <Link
                     to={"/dashboard/myEmployList"}
                     className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                    data-tip="My Employ List"
-                  >
+                    data-tip="My Employ List">
                     <HiUserGroup size={24} />
-                    <span className="is-drawer-close:hidden">My Employ List</span>
+                    <span className="is-drawer-close:hidden">
+                      My Employ List
+                    </span>
                   </Link>
                 </li>
 
@@ -145,8 +152,7 @@ const DashboardLayout = () => {
                   <Link
                     to={"/dashboard/allRequests"}
                     className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                    data-tip="All Requests"
-                  >
+                    data-tip="All Requests">
                     <MdRequestQuote size={24} />
                     <span className="is-drawer-close:hidden">All Requests</span>
                   </Link>
@@ -156,9 +162,8 @@ const DashboardLayout = () => {
                   <Link
                     to={"/dashboard/myPackages"}
                     className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                    data-tip="My Packages"
-                  >
-                    <LucidePackage  size={24} />
+                    data-tip="My Packages">
+                    <LucidePackage size={24} />
                     <span className="is-drawer-close:hidden">My Packages</span>
                   </Link>
                 </li>
@@ -166,10 +171,11 @@ const DashboardLayout = () => {
                   <Link
                     to={"/dashboard/payment-history"}
                     className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                    data-tip="Payment History"
-                  >
-                    <HistoryIcon  size={24} />
-                    <span className="is-drawer-close:hidden">Payment History</span>
+                    data-tip="Payment History">
+                    <HistoryIcon size={24} />
+                    <span className="is-drawer-close:hidden">
+                      Payment History
+                    </span>
                   </Link>
                 </li>
               </>
@@ -178,51 +184,43 @@ const DashboardLayout = () => {
             {/* Employee links */}
             {role === "employee" && (
               <>
-              <li>
-                <Link
-                  to={"/dashboard/allAssets"}
-                  className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                  data-tip="All Assets"
-                >
-                  <FaPrescriptionBottleAlt size={24} />
-                  <span className="is-drawer-close:hidden">All Assets</span>
-                </Link>
-              </li>
+                <li>
+                  <Link
+                    to={"/dashboard/allAssets"}
+                    className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                    data-tip="All Assets">
+                    <FaPrescriptionBottleAlt size={24} />
+                    <span className="is-drawer-close:hidden">All Assets</span>
+                  </Link>
+                </li>
 
-              <li>
-                <Link
-                  to={"/dashboard/myRequests"}
-                  className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                  data-tip="My Requests"
-                >
-                  <VscGitPullRequestGoToChanges size={24} />
-                  <span className="is-drawer-close:hidden">My Requests</span>
-                </Link>
-              </li>
+                <li>
+                  <Link
+                    to={"/dashboard/myRequests"}
+                    className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                    data-tip="My Requests">
+                    <VscGitPullRequestGoToChanges size={24} />
+                    <span className="is-drawer-close:hidden">My Requests</span>
+                  </Link>
+                </li>
 
-              <li>
-                <Link
-                  to={"/dashboard/myTeam"}
-                  className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                  data-tip="My Team"
-                >
-                  <FaUsers size={24} />
-                  <span className="is-drawer-close:hidden">My Team</span>
-                </Link>
-              </li>
+                <li>
+                  <Link
+                    to={"/dashboard/myTeam"}
+                    className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
+                    data-tip="My Team">
+                    <FaUsers size={24} />
+                    <span className="is-drawer-close:hidden">My Team</span>
+                  </Link>
+                </li>
               </>
             )}
-
-
-
-
 
             {/* Settings */}
             <li>
               <button
                 className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                data-tip="Settings"
-              >
+                data-tip="Settings">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -231,12 +229,17 @@ const DashboardLayout = () => {
                   strokeWidth="2"
                   fill="none"
                   stroke="currentColor"
-                  className="my-1.5 inline-block size-6"
-                >
+                  className="my-1.5 inline-block size-6">
                   <path d="M20 7h-9"></path>
                   <path d="M14 17H5"></path>
-                  <circle cx="17" cy="17" r="3"></circle>
-                  <circle cx="7" cy="7" r="3"></circle>
+                  <circle
+                    cx="17"
+                    cy="17"
+                    r="3"></circle>
+                  <circle
+                    cx="7"
+                    cy="7"
+                    r="3"></circle>
                 </svg>
                 <span className="is-drawer-close:hidden">Settings</span>
               </button>

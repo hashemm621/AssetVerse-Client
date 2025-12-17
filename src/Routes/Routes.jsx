@@ -51,7 +51,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/dashboard/addAssets",
+        path: "addAssets",
         element: (
           <HrRoute>
             <AddAssets />
@@ -59,7 +59,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/dashboard/myAssets",
+        path: "myAssets",
         element: (
           <HrRoute>
             <MyAssets />
@@ -67,7 +67,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/dashboard/myEmployList",
+        path: "myEmployList",
         element: (
           <HrRoute>
             <MyEmployeeList />
@@ -75,7 +75,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/dashboard/myPackages",
+        path: "myPackages",
         element: (
           <HrRoute>
             <Packages />
@@ -83,7 +83,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/dashboard/allRequests",
+        path: "allRequests",
         element: (
           <HrRoute>
             <AllRequests />
@@ -91,7 +91,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/dashboard/payment-success",
+        path: "payment-success",
         element: (
           <HrRoute>
             <PaymentSuccess />
@@ -99,7 +99,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/dashboard/payment-history",
+        path: "payment-history",
         element: (
           <HrRoute>
             <PaymentHistory />
@@ -107,7 +107,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/dashboard/allAssets",
+        path: "allAssets",
         element: (
           <EmployeeRoute>
             <AllAssets />
@@ -115,7 +115,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/dashboard/myRequests",
+        path: "myRequests",
         element: (
           <EmployeeRoute>
             <EmployeeRequestAssets />
@@ -123,7 +123,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/dashboard/myTeam",
+        path: "myTeam",
         element: (
           <EmployeeRoute>
             <EmployeeMyTeam />
