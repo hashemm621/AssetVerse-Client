@@ -1,460 +1,287 @@
 import React, { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { motion } from "framer-motion";
-import { FaPlus, FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaPlus, FaArrowLeft, FaArrowRight, FaEdit, FaTrashAlt, FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useUserInfo from "../../hooks/useUserInfo";
 import LoadingPage from "../LoadingPage/LoadingPage";
 import Swal from "sweetalert2";
-import { LucideAirVent } from "lucide-react";
 
 const MyAssets = () => {
   const { userInfo, isLoading: userLoading } = useUserInfo();
   const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const limit = 10;
+
+  // Modal States
   const [assignModalOpen, setAssignModalOpen] = useState(false);
-const [assignAsset, setAssignAsset] = useState(null);
-const [selectedEmployee, setSelectedEmployee] = useState("");
-  const queryClient = useQueryClient();
+  const [assignAsset, setAssignAsset] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // --- Queries ---
   const { data: assets = {}, isLoading } = useQuery({
     queryKey: ["hrAssets", userInfo?.email, page],
     enabled: !!userInfo?.email,
-    keepPreviousData: true,
     queryFn: async () => {
-      const res = await axiosSecure.get(
-        `/assets?hrEmail=${userInfo.email}&page=${page}&limit=${limit}`
-      );
+      const res = await axiosSecure.get(`/assets?hrEmail=${userInfo.email}&page=${page}&limit=${limit}`);
       return res.data;
     },
   });
 
-  // assign employ hooks
-const { data: employees = [] } = useQuery({
-  queryKey: ["affiliatedEmployees"],
-  enabled: !!userInfo?.email,
-  queryFn: async () => {
-    const res = await axiosSecure.get("/affiliations/hr");
-    return res.data;
-  },
-});
+  const { data: employees = [] } = useQuery({
+    queryKey: ["affiliatedEmployees"],
+    enabled: !!userInfo?.email,
+    queryFn: async () => {
+      const res = await axiosSecure.get("/affiliations/hr");
+      return res.data;
+    },
+  });
 
-const assignMutation = useMutation({
-  mutationFn: async () => {
-    return axiosSecure.patch(`/assets/assign/${assignAsset._id}`, {
-      employeeEmail: selectedEmployee.email,
-      employeeName: selectedEmployee.name,
-    });
-  },
-  onSuccess: () => {
-    toast.success("Asset assigned successfully");
-    queryClient.invalidateQueries({ queryKey: ["hrAssets"] });
-    setAssignModalOpen(false);
-    setSelectedEmployee("");
-  },
-  onError: err => {
-    toast.error(err?.response?.data?.message || "Assign failed");
-  },
-});
+  // --- Mutations ---
 
-  // update hooks
+  // Assign Asset Mutation
+  const assignMutation = useMutation({
+    mutationFn: async () => {
+      return axiosSecure.patch(`/assets/assign/${assignAsset._id}`, {
+        employeeEmail: selectedEmployee.email,
+        employeeName: selectedEmployee.name,
+      });
+    },
+    onSuccess: () => {
+      toast.success("Asset assigned successfully");
+      queryClient.invalidateQueries(["hrAssets"]);
+      setAssignModalOpen(false);
+      setSelectedEmployee(null);
+    },
+    onError: (err) => toast.error(err.response?.data?.message || "Assign failed"),
+  });
+
+  // Update Asset Mutation (Fixed Logic)
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }) => {
-      const res = await axiosSecure.patch(`/assets/${id}`, data);
+    mutationFn: async ({ id, updateData }) => {
+      const res = await axiosSecure.patch(`/assets/${id}`, updateData);
       return res.data;
     },
     onSuccess: () => {
-      Swal.fire("Updated!", "Asset updated successfully.", "success");
-      queryClient.invalidateQueries({ queryKey: ["hrAssets"] });
+      Swal.fire("Success!", "Asset updated successfully.", "success");
+      queryClient.invalidateQueries(["hrAssets"]);
       setIsModalOpen(false);
     },
-    onError: () => {
+    onError: (err) => {
+      console.error(err);
       Swal.fire("Error!", "Failed to update asset.", "error");
     },
   });
 
-  // delete hooks
+  // Delete Asset Mutation
   const deleteMutation = useMutation({
-    mutationFn: async id => {
-      const res = await axiosSecure.delete(`/assets/${id}`);
-      return res.data;
-    },
+    mutationFn: async (id) => axiosSecure.delete(`/assets/${id}`),
     onSuccess: () => {
-      Swal.fire("Deleted!", "Asset has been deleted.", "success");
+      Swal.fire("Deleted!", "Asset has been removed.", "success");
       queryClient.invalidateQueries(["hrAssets"]);
-    },
-    onError: () => {
-      Swal.fire("Error!", "Failed to delete asset.", "error");
     },
   });
 
-  if (isLoading || userLoading) {
-    return <LoadingPage />;
-  }
-
+  if (isLoading || userLoading) return <LoadingPage />;
   const totalPages = assets.totalPages || 1;
 
-  const handleAssign = asset => {
-  setAssignAsset(asset);
-  setAssignModalOpen(true);
-};
-
-
-  // handle update Assets
-  const handleUpdate = asset => {
-    setSelectedAsset(asset);
-    setIsModalOpen(true);
-  };
-
-  // handle Delete
-  const handleDelete = id => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then(result => {
-      if (result.isConfirmed) {
-        deleteMutation.mutate(id);
-      }
+  // --- Handlers ---
+  const handleUpdateSubmit = (e) => {
+    e.preventDefault();
+    const { _id, productName, productType, productQuantity, availableQuantity } = selectedAsset;
+    
+    updateMutation.mutate({
+      id: _id,
+      updateData: {
+        productName,
+        productType,
+        productQuantity: Number(productQuantity),
+        availableQuantity: Number(availableQuantity),
+      },
     });
   };
 
-  // handle assign comfirmation
-  const handleConfirmAssign = () => {
-  Swal.fire({
-    title: "Assign Asset?",
-    text: `Are you sure you want to assign "${assignAsset.productName}" to ${selectedEmployee.name}?`,
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Yes, Assign",
-    cancelButtonText: "Cancel",
-    confirmButtonColor: "#1E3A8A",
-  }).then(result => {
-    if (result.isConfirmed) {
-      assignMutation.mutate();
-    }
-  });
-};
-
   return (
-    <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-2xl md:text-4xl font-bold mb-6 text-center text-(--color-primary)">
-        HR Asset List
-      </h2>
+    <div className="w-full min-h-screen bg-gray-50 py-6 px-4 md:px-8">
+      <div className="max-w-[1600px] mx-auto">
+        <h2 className="text-2xl md:text-4xl font-black mb-8 text-center text-slate-800 uppercase tracking-wide">
+          HR Asset Management
+        </h2>
 
-      {/* updated modal */}
-      {isModalOpen && selectedAsset && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-lg">
-            <h3 className="text-xl font-bold mb-4">Update Asset</h3>
-
-            {/* Product Name */}
-            <label>Product Name:</label>
-            <input
-              className="input input-bordered w-full mb-5"
-              value={selectedAsset.productName}
-              onChange={e =>
-                setSelectedAsset({
-                  ...selectedAsset,
-                  productName: e.target.value,
-                })
-              }
-              placeholder="Product Name"
-            />
-
-            {/* Product Image */}
-            <label>Product Details:</label>
-            <input
-              className="input input-bordered w-full mb-3"
-              value={selectedAsset.productDetails}
-              onChange={e =>
-                setSelectedAsset({
-                  ...selectedAsset,
-                  productImage: e.target.value,
-                })
-              }
-            />
-
-            {/* Product Type */}
-            <label>Product Type:</label>
-            <select
-              className="select select-bordered w-full mb-3"
-              value={selectedAsset.productType}
-              onChange={e =>
-                setSelectedAsset({
-                  ...selectedAsset,
-                  productType: e.target.value,
-                })
-              }>
-              <option value="returnable">Returnable</option>
-              <option value="non-returnable">Non-returnable</option>
-            </select>
-
-            {/* Product Quantity */}
-            <label>Product Quantity:</label>
-            <input
-              type="number"
-              className="input input-bordered w-full mb-3"
-              value={selectedAsset.productQuantity}
-              onChange={e =>
-                setSelectedAsset({
-                  ...selectedAsset,
-                  productQuantity: Number(e.target.value),
-                })
-              }
-              placeholder="Total Quantity"
-            />
-
-            {/* Available Quantity */}
-            <label>Available Quantity</label>
-            <input
-              type="number"
-              className="input input-bordered w-full mb-4"
-              value={selectedAsset.availableQuantity}
-              onChange={e =>
-                setSelectedAsset({
-                  ...selectedAsset,
-                  availableQuantity: Number(e.target.value),
-                })
-              }
-              placeholder="Available Quantity"
-            />
-
-            {/* Buttons */}
-            <div className="flex justify-end gap-3">
-              <button
-                className="btn btn-outline"
-                onClick={() => setIsModalOpen(false)}>
-                Cancel
-              </button>
-
-              <button
-                className="btn btn-primary"
-                disabled={updateMutation.isPending}
-                onClick={() =>
-                  updateMutation.mutate({
-                    id: selectedAsset._id,
-                    data: {
-                      productName: selectedAsset.productName,
-                      productDetails: selectedAsset.productDetails,
-                      productType: selectedAsset.productType,
-                      productQuantity: selectedAsset.productQuantity,
-                      availableQuantity: selectedAsset.availableQuantity,
-                    },
-                  })
-                }>
-                {updateMutation.isPending ? "Updating..." : "Update Asset"}
-              </button>
-            </div>
-          </div>
+        {/* --- DESKTOP TABLE (FULL WIDTH) --- */}
+        <div className="hidden lg:block w-full bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+          <table className="table w-full">
+            <thead className="bg-slate-900 text-white">
+              <tr className="text-sm uppercase font-bold">
+                <th className="py-5 pl-8">Image</th>
+                <th>Asset Name</th>
+                <th>Type</th>
+                <th>Stock (Available/Total)</th>
+                <th>Created Date</th>
+                <th className="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 font-medium">
+              {assets.items?.map((asset) => (
+                <tr key={asset._id} className="hover:bg-slate-50 transition-colors">
+                  <td className="pl-8 py-4">
+                    <img src={asset.productImage} className="w-14 h-14 rounded-xl object-cover shadow-sm" alt="" />
+                  </td>
+                  <td className="text-slate-800 font-bold">{asset.productName}</td>
+                  <td>
+                    <span className={`badge badge-md font-bold ${asset.productType === 'returnable' ? 'badge-primary' : 'badge-ghost border-slate-300'}`}>
+                      {asset.productType}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs font-black text-slate-500">{asset.availableQuantity} of {asset.productQuantity}</span>
+                      <progress className="progress progress-primary w-32 h-2" value={asset.availableQuantity} max={asset.productQuantity}></progress>
+                    </div>
+                  </td>
+                  <td className="text-slate-500 text-sm">{new Date(asset.createdAt).toLocaleDateString()}</td>
+                  <td className="text-center">
+                    <div className="flex justify-center gap-2">
+                      <button onClick={() => { setAssignAsset(asset); setAssignModalOpen(true); }} disabled={asset.availableQuantity < 1} className="btn btn-sm btn-primary">Assign</button>
+                      <button onClick={() => { setSelectedAsset({ ...asset }); setIsModalOpen(true); }} className="btn btn-sm btn-square btn-outline btn-info"><FaEdit /></button>
+                      <button onClick={() => {
+                        Swal.fire({ title: 'Delete Asset?', text: "You won't be able to revert this!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33' }).then(r => r.isConfirmed && deleteMutation.mutate(asset._id))
+                      }} className="btn btn-sm btn-square btn-outline btn-error"><FaTrashAlt /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
 
-      {/* assign employ */}
-      {assignModalOpen && assignAsset && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <motion.div
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      className="bg-white rounded-xl p-6 w-full max-w-md"
-    >
-      <h3 className="text-xl font-bold mb-4">
-        Assign {assignAsset.productName}
-      </h3>
-
-      <select
-        className="select select-bordered w-full mb-4"
-        value={selectedEmployee?.email || ""}
-        onChange={e => {
-          const emp = employees.find(
-            emp => emp.employeeEmail === e.target.value
-          );
-          setSelectedEmployee({
-            email: emp.employeeEmail,
-            name: emp.employeeName,
-          });
-        }}
-      >
-        <option value="">Select Employee</option>
-        {employees.map(emp => (
-          <option key={emp._id} value={emp.employeeEmail}>
-            {emp.employeeName} ({emp.employeeEmail})
-          </option>
-        ))}
-      </select>
-
-      <div className="flex justify-end gap-3">
-        <button
-          className="btn btn-outline"
-          onClick={() => setAssignModalOpen(false)}
-        >
-          Cancel
-        </button>
-
-        <button
-          className="btn btn-primary"
-          disabled={!selectedEmployee || assignMutation.isPending}
-          onClick={handleConfirmAssign}
-        >
-          {assignMutation.isPending ? "Assigning..." : "Assign"}
-        </button>
-      </div>
-    </motion.div>
-  </div>
-)}
-
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="hidden md:block overflow-x-auto bg-white rounded-2xl shadow-lg">
-        <table className="table table-zebra w-full">
-          <thead className="bg-(--color-secondary) text-white">
-            <tr>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Stock</th>
-              <th>Date</th>
-              <th className="flex justify-center">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {assets.items?.map(asset => (
-              <motion.tr
-                key={asset._id}
-                whileHover={{ scale: 1.02 }}>
-                <td>
-                  <img
-                    src={asset.productImage}
-                    className="w-14 h-14 rounded-lg object-cover"
-                  />
-                </td>
-                <td className="font-semibold">{asset.productName}</td>
-                <td>{asset.productType}</td>
-                <td>{`${asset.availableQuantity}/${asset.productQuantity}`}</td>
-                <td>{new Date(asset.createdAt).toLocaleDateString()}</td>
-                <td className="flex flex-wrap gap-2">
-                  <button
-                    className="btn btn-sm btn-primary gap-2"
-                    onClick={() => handleAssign(asset)}
-                    disabled={asset.availableQuantity < 1}>
-                    <FaPlus /> Assign
-                  </button>
-
-                  <button
-                    className="btn btn-sm btn-accent gap-2"
-                    onClick={() => handleUpdate(asset)}>
-                    <FaEdit /> Update
-                  </button>
-
-                  <button
-                    className="btn btn-sm btn-error gap-2"
-                    disabled={deleteMutation.isPending}
-                    onClick={() => handleDelete(asset._id)}>
-                    {deleteMutation.isPending ? (
-                      "Deleting..."
-                    ) : (
-                      <span className="flex justify-center items-center gap-1">
-                        <FaTrashAlt /> Delete
-                      </span>
-                    )}
-                  </button>
-                </td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </table>
-      </motion.div>
-
-      <div className="block md:hidden space-y-4">
-        {assets.items?.map(asset => (
-          <motion.div
-            key={asset._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow p-4">
-            <div className="flex gap-4">
-              <img
-                src={asset.productImage}
-                className="w-20 h-20 rounded-lg object-cover"
-              />
-              <div className="flex-1">
-                <h3 className="font-bold text-lg">{asset.productName}</h3>
-                <p className="text-sm text-gray-600 font-semibold">
-                  Type: {asset.productType}
-                </p>
-                <p className="text-sm">
-                  Available:{" "}
-                  {`${asset.availableQuantity}/${asset.productQuantity}`}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {new Date(asset.createdAt).toLocaleDateString()}
-                </p>
+        {/* --- MOBILE VIEW --- */}
+        <div className="lg:hidden flex flex-col gap-4">
+          {assets.items?.map((asset) => (
+            <div key={asset._id} className="bg-white p-5 rounded-2xl shadow-md border border-gray-100">
+              <div className="flex gap-4 mb-4">
+                <img src={asset.productImage} className="w-20 h-20 rounded-xl object-cover" alt="" />
+                <div className="flex-1">
+                  <h3 className="font-black text-slate-800">{asset.productName}</h3>
+                  <p className="text-xs font-bold text-blue-600 uppercase">{asset.productType}</p>
+                  <p className="text-sm mt-1 font-bold">Available: {asset.availableQuantity}/{asset.productQuantity}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <button onClick={() => { setAssignAsset(asset); setAssignModalOpen(true); }} className="btn btn-sm btn-primary">Assign</button>
+                <button onClick={() => { setSelectedAsset({ ...asset }); setIsModalOpen(true); }} className="btn btn-sm btn-info btn-outline"><FaEdit /></button>
+                <button 
+  onClick={() => {
+    Swal.fire({ 
+      title: 'Delete Asset?', 
+      text: "You won't be able to revert this!", 
+      icon: 'warning', 
+      showCancelButton: true, 
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteMutation.mutate(asset._id);
+      }
+    })
+  }} 
+  className="btn btn-sm btn-error btn-outline"
+>
+  <FaTrashAlt />
+</button>
               </div>
             </div>
+          ))}
+        </div>
 
-            <div className="flex flex-col gap-2 mt-4">
-              <button
-                className="btn btn-sm btn-primary gap-2"
-                onClick={() => handleAssign(asset)}
-                disabled={asset.availableQuantity < 1}>
-                <FaPlus /> Assign
-              </button>
-
-              <button
-                className="btn btn-sm btn-accent gap-2"
-                onClick={() => handleUpdate(asset)}>
-                <FaEdit /> Update
-              </button>
-
-              <button
-                className="btn btn-sm btn-error gap-2"
-                disabled={deleteMutation.isPending}
-                onClick={() => handleDelete(asset._id)}>
-                {deleteMutation.isPending ? (
-                  "Deleting..."
-                ) : (
-                  <span className="flex justify-center items-center gap-1">
-                    <FaTrashAlt /> Delete
-                  </span>
-                )}
-              </button>
-            </div>
-          </motion.div>
-        ))}
+        {/* --- PAGINATION --- */}
+        <div className="mt-8 flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+          <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="btn btn-sm btn-ghost"><FaArrowLeft /> Prev</button>
+          <span className="font-black text-slate-700">Page {page} of {totalPages}</span>
+          <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="btn btn-sm btn-ghost">Next <FaArrowRight /></button>
+        </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 bg-gray-50 p-4 rounded-xl">
-        <button
-          className="btn btn-sm btn-outline w-full sm:w-auto"
-          onClick={() => setPage(p => Math.max(p - 1, 1))}
-          disabled={page === 1}>
-          <FaArrowLeft /> Prev
-        </button>
+      {/* --- UPDATE MODAL --- */}
+      <AnimatePresence>
+        {isModalOpen && selectedAsset && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-100 p-4">
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} 
+              className="bg-white rounded-3xl p-6 md:p-10 w-full max-w-lg shadow-2xl relative">
+              <button onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-slate-400 hover:text-red-500 transition-colors"><FaTimes size={20} /></button>
+              <h3 className="text-2xl font-black text-slate-800 mb-8 border-b pb-4">Update Asset</h3>
+              
+              <form onSubmit={handleUpdateSubmit} className="space-y-5">
+                <div className="form-control w-full">
+                  <label className="label font-bold text-slate-600">Product Name</label>
+                  <input required className="input input-bordered focus:ring-2 ring-primary" value={selectedAsset.productName} onChange={e => setSelectedAsset({...selectedAsset, productName: e.target.value})} />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="form-control">
+                    <label className="label font-bold text-slate-600">Type</label>
+                    <select className="select select-bordered" value={selectedAsset.productType} onChange={e => setSelectedAsset({...selectedAsset, productType: e.target.value})}>
+                      <option value="returnable">Returnable</option>
+                      <option value="non-returnable">Non-returnable</option>
+                    </select>
+                  </div>
+                  <div className="form-control">
+                    <label className="label font-bold text-slate-600">Total Qty</label>
+                    <input type="number" required className="input input-bordered" value={selectedAsset.productQuantity} onChange={e => setSelectedAsset({...selectedAsset, productQuantity: e.target.value})} />
+                  </div>
+                </div>
 
-        <span className="text-sm">
-          Page {page} of {totalPages}
-        </span>
+                <div className="form-control">
+                  <label className="label font-bold text-slate-600">Available Qty</label>
+                  <input type="number" required className="input input-bordered" value={selectedAsset.availableQuantity} onChange={e => setSelectedAsset({...selectedAsset, availableQuantity: e.target.value})} />
+                </div>
 
-        <button
-          className="btn btn-sm btn-outline w-full sm:w-auto"
-          onClick={() => setPage(p => Math.min(p + 1, totalPages))}
-          disabled={page === totalPages}>
-          Next <FaArrowRight />
-        </button>
-      </div>
+                <button type="submit" className="btn btn-primary w-full mt-4 h-12 text-lg shadow-lg shadow-blue-200" disabled={updateMutation.isPending}>
+                  {updateMutation.isPending ? <span className="loading loading-spinner"></span> : "Update Now"}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* --- ASSIGN MODAL --- */}
+      <AnimatePresence>
+        {assignModalOpen && assignAsset && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-100 p-4">
+            <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 30, opacity: 0 }} 
+              className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+              <h3 className="text-xl font-black text-slate-800 mb-2 uppercase">Assign This Asset</h3>
+              <p className="text-slate-500 mb-8">Selected: <span className="font-bold text-blue-600">{assignAsset.productName}</span></p>
+              
+              <label className="label font-bold text-slate-700">Choose Employee Member</label>
+              <select required className="select select-bordered w-full mb-8 h-12" 
+                onChange={e => {
+                  const emp = employees.find(i => i.employeeEmail === e.target.value);
+                  if (emp) setSelectedEmployee({ email: emp.employeeEmail, name: emp.employeeName });
+                }}>
+                <option value="">-- Choose from affiliated --</option>
+                {employees.map(emp => (
+                  <option key={emp._id} value={emp.employeeEmail}>{emp.employeeName} ({emp.employeeEmail})</option>
+                ))}
+              </select>
+
+              <div className="flex gap-4">
+                <button type="button" className="btn btn-ghost flex-1" onClick={() => setAssignModalOpen(false)}>Cancel</button>
+                <button className="btn btn-primary flex-1 shadow-lg" disabled={!selectedEmployee || assignMutation.isPending} 
+                  onClick={() => assignMutation.mutate()}>
+                  {assignMutation.isPending ? "Assigning..." : "Assign Now"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

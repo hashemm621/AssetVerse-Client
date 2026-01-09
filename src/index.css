@@ -10,3 +10,13 @@
   --color-secondary: #0F172A;
   --color-accent:#38BDF8;
 }
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  --color-primary: #3b82f6; /* ডার্ক মোডে একটু ব্রাইট ব্লু */
+  --color-secondary: #1e293b;
+  --color-accent: #0ea5e9;
+  --color-base-100: #0f172a; /* গাঢ় নীল/কালো ব্যাকগ্রাউন্ড */
+  --color-base-200: #1e293b;
+  --color-base-content: #f8fafc; /* হালকা রঙের টেক্সট */
+}

@@ -23,7 +23,7 @@ const Banner = () => {
 const {user} = useAuth()
   return (
     <section className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-500 py-16 lg:py-28">
-      <MyContainer className="flex flex-col-reverse lg:flex-row items-center gap-12">
+      <MyContainer className="flex py-15 flex-col-reverse lg:flex-row items-center gap-12">
         {/* LEFT: Text */}
         <div className="flex-1 w-full">
           <motion.h1

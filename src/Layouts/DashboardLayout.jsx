@@ -39,7 +39,7 @@ const DashboardLayout = () => {
   }
 
   return (
-    <div className="drawer md:max-w-7xl mx-auto lg:drawer-open">
+    <div className="drawer mx-auto lg:drawer-open">
       <input
         id="my-drawer-4"
         type="checkbox"
@@ -48,7 +48,7 @@ const DashboardLayout = () => {
       <div className="drawer-content">
         {/* Navbar */}
         <nav className="bg-primary sticky top-0 z-50">
-          <MyContainer className="navbar text-white">
+          <div className="navbar text-white">
             <label
               htmlFor="my-drawer-4"
               aria-label="open sidebar"
@@ -67,7 +67,7 @@ const DashboardLayout = () => {
               </Link>{" "}
               <span>assetVerse Dashboard</span>
             </div>
-          </MyContainer>
+          </div>
         </nav>
 
         {/* Page content */}
@@ -216,34 +216,7 @@ const DashboardLayout = () => {
               </>
             )}
 
-            {/* Settings */}
-            <li>
-              <button
-                className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
-                data-tip="Settings">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                  strokeWidth="2"
-                  fill="none"
-                  stroke="currentColor"
-                  className="my-1.5 inline-block size-6">
-                  <path d="M20 7h-9"></path>
-                  <path d="M14 17H5"></path>
-                  <circle
-                    cx="17"
-                    cy="17"
-                    r="3"></circle>
-                  <circle
-                    cx="7"
-                    cy="7"
-                    r="3"></circle>
-                </svg>
-                <span className="is-drawer-close:hidden">Settings</span>
-              </button>
-            </li>
+            
           </ul>
         </div>
       </div>
