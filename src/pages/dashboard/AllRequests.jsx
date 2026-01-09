@@ -14,7 +14,7 @@ const AllRequests = () => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // --- ডাটা ফেচিং ---
+
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["requests"],
     queryFn: async () => {
@@ -25,20 +25,20 @@ const AllRequests = () => {
 
   const requests = data || [];
 
-  // সার্চ ফিল্টারিং লজিক
+
   const filteredRequests = requests.filter(req => 
     req.requesterName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     req.assetName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // --- আপডেট মিউটেশন ---
+console.log(filteredRequests);
   const updateRequestMutation = useMutation({
     mutationFn: ({ id, action }) => axiosSecure.patch(`/requests/${id}`, { action }),
     onSuccess: () => {
       toast.success("Status Updated!");
-      // ১. ইনভ্যালিড করা
+      
       queryClient.invalidateQueries({ queryKey: ["requests"] });
-      // ২. সরাসরি রি-ফেচ ট্রিগার করা (UI রিফ্রেশের জন্য)
+    
       refetch(); 
       setSelectedRequest(null);
     },
@@ -83,7 +83,7 @@ const AllRequests = () => {
   );
 
   return (
-    // overflow-x-hidden যুক্ত করা হয়েছে যাতে মোবাইল স্লাইড না হয়
+   
     <div className="w-full max-w-[100vw] overflow-x-hidden px-2 sm:px-4 lg:px-10 py-6 bg-[#F8FAFC] min-h-screen">
       
       {/* Header & Search */}
@@ -108,7 +108,7 @@ const AllRequests = () => {
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden lg:block w-full bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+      <div className="hidden lg:block w-full bg-white rounded-4xl shadow-sm border border-slate-100 overflow-hidden">
         <table className="table w-full border-separate border-spacing-0">
           <thead className="bg-slate-50/50">
             <tr>
@@ -124,7 +124,7 @@ const AllRequests = () => {
                 <td className="py-4 pl-8">
                   <div className="flex items-center gap-3">
                     <div className="avatar placeholder">
-                      <div className="bg-blue-100 text-blue-600 rounded-xl w-10 h-10 font-bold uppercase">
+                      <div className="bg-blue-100 flex items-center justify-center text-blue-600 rounded-xl w-10 h-10 font-bold uppercase">
                         {req.requesterName?.charAt(0)}
                       </div>
                     </div>
@@ -163,7 +163,7 @@ const AllRequests = () => {
         </table>
       </div>
 
-      {/* Mobile Card Layout - গ্রিড ভিউ এবং রেসপন্সিভনেস নিশ্চিত করা হয়েছে */}
+    
       <div className="lg:hidden grid grid-cols-1 gap-4 w-full">
         {filteredRequests.map((req) => (
           <div 
@@ -223,12 +223,12 @@ const AllRequests = () => {
       {/* Details Modal */}
       <AnimatePresence>
         {selectedRequest && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4">
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-200 p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-white rounded-[2rem] p-6 sm:p-10 w-full max-w-lg shadow-2xl relative"
+              className="bg-white rounded-4xl p-6 sm:p-10 w-full max-w-lg shadow-2xl relative"
             >
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-black text-slate-800">Request Information</h3>
@@ -256,7 +256,7 @@ const AllRequests = () => {
   );
 };
 
-// ছোট হেল্পার কম্পোনেন্ট
+
 const DetailItem = ({ label, value, sub }) => (
   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
     <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{label}</p>
